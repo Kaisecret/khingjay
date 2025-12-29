@@ -1,0 +1,74 @@
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+code, pre {
+    font-family: 'Fira Code', monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+/* Animation Utilities */
+.opacity-0 {
+    opacity: 0;
+}
+
+.animate-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Flex utilities for Hidden elements */
+.hidden-force {
+    display: none !important;
+}
+
+.flex-force {
+    display: flex !important;
+}
+
+/* Chat window specific */
+#chat-window {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#chat-window.hidden {
+    display: none;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+}
+
+#chat-window.flex {
+    display: flex;
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
