@@ -2,32 +2,46 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Adjusting paths: assumes phpmailer folder is outside the api folder
+// Paths for Vercel deployment
 require '../phpmailer/src/Exception.php';
 require '../phpmailer/src/PHPMailer.php';
 require '../phpmailer/src/SMTP.php';
 
-// Set header so JavaScript knows we are sending JSON
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail = new PHPMailer(true);
 
     try {
-        // SMTP Server Settings
+        // --- SERVER SETTINGS ---
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'sanom6268@gmail.com'; 
-        $mail->Password   = 'ptfbjqlspupjrswp';    // Your Gmail App Password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
         
-        // Sender and Receiver
-        $mail->setFrom('sanom6268@gmail.com', 'Portfolio Contact');
-        $mail->addAddress('regalakhing@sac.edu.ph'); // Where you want to receive emails
+        // Credentials
+        $mail->Username   = 'sanom6268@gmail.com'; 
+        $mail->Password   = 'ptfbjqlspupjrswp'; // Your 16-char App Password
+        
+        // Encryption & Port
+        // Port 465 + SMTPS is often more reliable on cloud hosting than 587
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; 
+        $mail->Port       = 465;
 
-        // Email Content
+        // --- SSL FIX FOR CLOUD HOSTING ---
+        // This prevents "SMTP connect() failed" errors on many servers
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+
+        // --- RECIPIENTS ---
+        $mail->setFrom('sanom6268@gmail.com', 'Portfolio Contact');
+        $mail->addAddress('regalakhing@sac.edu.ph'); 
+
+        // --- CONTENT ---
         $mail->isHTML(true);
         $mail->Subject = 'New Portfolio Message from ' . $_POST['name'];
         
@@ -47,9 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ";
 
         $mail->send();
-        echo json_encode(["status" => "success", "message" => "Message sent!"]);
+        echo json_encode(["status" => "success", "message" => "Mail sent"]);
     } catch (Exception $e) {
-        echo json_encode(["status" => "error", "message" => $mail->ErrorInfo]);
+        echo json_encode(["status" => "error", "message" => "Mailer Error: " . $mail->ErrorInfo]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "Invalid Request"]);
