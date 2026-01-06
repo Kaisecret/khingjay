@@ -60,21 +60,21 @@ const PROJECTS = [
   },
   {
     id: 5,
-    title: 'Library Management System',
-    description: 'A robust desktop application for managing library resources, borrowing history, and member records with barcode support.',
-    technologies: ['C#', 'SQL Server', '.NET'],
-    imageUrl: 'https://picsum.photos/seed/library/600/400',
+    title: 'StudentWellnessGuard',
+    description: 'Our AI-powered tool analyzes facial cues to detect early signs of fatigue and stress',
+    technologies: ['Php', 'MySQL', 'Python', "Tailwind","Pycharm","Vscode", "Xampp"],
+    imageUrl: 'Blue and Yellow Modern Custom Website Development Services Instagram Post (5).png',
     demoUrl: '#',
     codeUrl: '#'
   },
   {
     id: 6,
-    title: 'Real-time Weather App',
-    description: 'A dynamic weather forecasting application that provides real-time data visualization and forecasts using public APIs.',
-    technologies: ['JavaScript', 'HTML5', 'OpenWeatherMap API'],
-    imageUrl: 'https://picsum.photos/seed/weather/600/400',
-    demoUrl: '#',
-    codeUrl: '#'
+    title: 'ILOVE YOU VENUS',
+    description: 'A simple anniversary website that includes games, our pictures, a heartfelt letter, and a virtual garden.',
+    technologies: ['JavaScript', 'HTML5', 'Tailwind'],
+    imageUrl: 'Blue and Yellow Modern Custom Website Development Services Instagram Post (6).png',
+    demoUrl: 'https://kaisecret.github.io/happy_anniversary/home.html',
+    codeUrl: 'https://github.com/Kaisecret/happy_anniversary'
   }
 ];
 
@@ -676,4 +676,47 @@ async function handleSendMessage() {
 chatSend.addEventListener('click', handleSendMessage);
 chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleSendMessage();
+
 });
+
+// ================= CONTACT FORM SUBMISSION =================
+const contactForm = document.getElementById('contact-form');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
+    // Loading State
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Sending...';
+
+    const formData = new FormData(contactForm);
+
+    try {
+      // Changed path to 'api/send-email.php' (relative to your index.html)
+      const response = await fetch('api/send-email.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      // Check if the response is actually JSON
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        alert('Thank you! Your message has been sent to Khing.');
+        contactForm.reset();
+      } else {
+        alert('Mail Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error("Submission Error:", error);
+      alert('Could not connect to the mail server. Ensure XAMPP is running and you are accessing the site via http://localhost/');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    }
+  });
+}
