@@ -1,20 +1,10 @@
 {
   "functions": {
     "api/*.php": {
-      "runtime": "vercel-php@0.7.4",
-      "config": {
-        "nodeVersion": "20.x"
-      }
+      "runtime": "vercel-php@0.7.4"
     }
   },
-  "routes": [
-    {
-      "src": "/api/(.*).php",
-      "dest": "/api/$1.php"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+  "rewrites": [
+    { "source": "/api/send-email", "destination": "/api/send-email.php" }
   ]
 }

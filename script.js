@@ -679,10 +679,10 @@ chatInput.addEventListener('keydown', (e) => {
 
 });
 // ================= CONTACT FORM SUBMISSION =================
-const contactForm = document.getElementById('contact-form');
+const contactForm = document.getElementById("contact-form");
 
 if (contactForm) {
-  contactForm.addEventListener('submit', async (e) => {
+  contactForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const submitBtn = contactForm.querySelector('button[type="submit"]');
@@ -690,43 +690,45 @@ if (contactForm) {
 
     // 1. Loading State
     submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Sending...';
+    submitBtn.innerHTML = "Sending...";
 
     const formData = new FormData(contactForm);
 
     try {
-      // 2. Fetch call to the PHP backend
-      const response = await fetch('api/send-email.php', {
-        method: 'POST',
+      // IMPORTANT: Use absolute path so it works on any route/page
+      const response = await fetch("/api/send-email.php", {
+        method: "POST",
         body: formData
       });
 
-      // 3. Check if the server actually returned a success code (200)
+      // Try to parse JSON even on errors (PHP may return error JSON with 400/500)
+      const result = await response.json().catch(() => null);
+
+      // 3. If HTTP status is not OK (400/500), show server message if available
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+        const msg = result?.message || `Server responded with ${response.status}: ${response.statusText}`;
+        throw new Error(msg);
       }
 
-      // 4. Parse the JSON response
-      const result = await response.json();
-
-      if (result.status === 'success') {
-        alert('Thank you! Your message has been sent to Khing.');
+      // 4. Handle app-level success/error
+      if (result && result.status === "success") {
+        alert("Thank you! Your message has been sent to Khing.");
         contactForm.reset();
       } else {
-        // This catches errors sent back BY the PHP (like SMTP login failure)
-        alert('Mail Error: ' + result.message);
+        alert("Mail Error: " + (result?.message || "Unknown error"));
       }
     } catch (error) {
-      // 5. Improved Error Handling
       console.error("Submission Error:", error);
-      
-      // We check if the site is running on Vercel or Localhost to give a better hint
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      
+
+      const isLocal =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
       if (isLocal) {
-        alert('Local Error: Ensure XAMPP (Apache) is running and you are using http://localhost/');
+        alert("Local Error: Ensure XAMPP (Apache) is running and you are using http://localhost/");
       } else {
-        alert('Server Error: The email function failed on Vercel. Check the Vercel Logs or vercel.json configuration.');
+        // This will now show the real PHP error message when available
+        alert("Server Error: " + (error?.message || "The email function failed on Vercel."));
       }
     } finally {
       // 6. Restore Button State
