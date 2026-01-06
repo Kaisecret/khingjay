@@ -678,7 +678,6 @@ chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleSendMessage();
 
 });
-
 // ================= CONTACT FORM SUBMISSION =================
 const contactForm = document.getElementById('contact-form');
 
@@ -689,32 +688,48 @@ if (contactForm) {
     const submitBtn = contactForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
 
-    // Loading State
+    // 1. Loading State
     submitBtn.disabled = true;
     submitBtn.innerHTML = 'Sending...';
 
     const formData = new FormData(contactForm);
 
     try {
-      // Changed path to 'api/send-email.php' (relative to your index.html)
+      // 2. Fetch call to the PHP backend
       const response = await fetch('api/send-email.php', {
         method: 'POST',
         body: formData
       });
 
-      // Check if the response is actually JSON
+      // 3. Check if the server actually returned a success code (200)
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+      }
+
+      // 4. Parse the JSON response
       const result = await response.json();
 
       if (result.status === 'success') {
         alert('Thank you! Your message has been sent to Khing.');
         contactForm.reset();
       } else {
+        // This catches errors sent back BY the PHP (like SMTP login failure)
         alert('Mail Error: ' + result.message);
       }
     } catch (error) {
+      // 5. Improved Error Handling
       console.error("Submission Error:", error);
-      alert('Could not connect to the mail server. Ensure XAMPP is running and you are accessing the site via http://localhost/');
+      
+      // We check if the site is running on Vercel or Localhost to give a better hint
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (isLocal) {
+        alert('Local Error: Ensure XAMPP (Apache) is running and you are using http://localhost/');
+      } else {
+        alert('Server Error: The email function failed on Vercel. Check the Vercel Logs or vercel.json configuration.');
+      }
     } finally {
+      // 6. Restore Button State
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
     }
