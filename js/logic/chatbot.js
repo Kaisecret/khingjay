@@ -11,6 +11,8 @@ function formatBotText(text) {
   return escapeHtml(text).replaceAll('\n', '<br>');
 }
 
+const GROQ_API_KEY = window.GROQ_API_KEY || ''; 
+
 const FALLBACK_FULL = `Name: Khing Jay Regala
 Role: IT student and aspiring full stack / web developer
 Email: regalakhing@sac.edu.ph
@@ -19,34 +21,56 @@ Location: Mapatag Hamtic Antique
 
 Projects: PhysiqueCheck, SMARTCHOICE, String Builder Portflio, PassGenAI, StudentWellnessGuard, ILOVE YOU VENUS`;
 
-async function fetchBackendReply(message) {
-  const endpoints = ['/api/chatbot', '/api/chatbot.php'];
+const SYSTEM_PROMPT = `You are an AI assistant on Khing Jay Regala's portfolio website. You can answer general questions and portfolio questions.
 
-  for (const endpoint of endpoints) {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
+Important behavior rules:
+1) If user asks for Khing's location, provide: Mapatag Hamtic Antique.
+2) If user asks for YOUR location / AI location, say you do not have a physical location.
+3) Do not confuse AI location with Khing's location.
+4) Be concise and clear.
 
-      const result = await response.json().catch(() => null);
-      if (response.ok && result?.reply) {
-        return result.reply;
-      }
-    } catch {
-      // Try next endpoint.
-    }
+Portfolio Data:
+Name: Khing Jay Regala
+Role: IT student and aspiring full stack / web developer
+Email: regalakhing@sac.edu.ph
+Phone: 09382604239
+Location: Mapatag Hamtic Antique
+Projects: PhysiqueCheck, SMARTCHOICE, String Builder Portflio, PassGenAI, StudentWellnessGuard, ILOVE YOU VENUS`;
+
+async function fetchGroqReply(message) {
+  if (!GROQ_API_KEY) throw new Error('Missing GROQ_API_KEY in window.GROQ_API_KEY');
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.3,
+      max_tokens: 320,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: message }
+      ]
+    })
+  });
+
+  const result = await response.json().catch(() => null);
+  const reply = result?.choices?.[0]?.message?.content?.trim();
+
+  if (!response.ok || !reply) {
+    throw new Error(result?.error?.message || 'Groq API request failed.');
   }
 
-  throw new Error('Backend chat endpoint failed.');
+  return reply;
 }
 
 function getOfflineReply(message) {
   const text = message.toLowerCase();
 
   if (/^\s*(hi|hello|hey|hi po|hello po|hey po)\s*!*\s*$/.test(text)) {
-    return `Hi! I can still help while the API is down.\nAsk me about Khing Jay's projects, skills, email, phone, or location.`;
+    return `Hi! I can still help while the API is unavailable.\nAsk me about Khing Jay's projects, skills, email, phone, or location.`;
   }
 
   if (/email|mail/.test(text)) return 'Email: regalakhing@sac.edu.ph';
@@ -61,7 +85,7 @@ function getOfflineReply(message) {
     return 'Skills: Java, Python, JavaScript, C#, HTML, CSS, React, Tailwind CSS, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase';
   }
 
-  return `${FALLBACK_FULL}\n\n(API is currently unavailable, so this is offline profile data.)`;
+  return `${FALLBACK_FULL}\n\n(API is unavailable, so this is offline profile data.)`;
 }
 
 export function initChatbot() {
@@ -133,7 +157,7 @@ export function initChatbot() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-      const reply = await fetchBackendReply(text);
+      const reply = await fetchGroqReply(text);
       loadingDiv.remove();
       appendMessage('model', reply);
     } catch (error) {
