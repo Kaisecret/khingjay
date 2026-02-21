@@ -11,6 +11,14 @@ function formatBotText(text) {
   return escapeHtml(text).replaceAll('\n', '<br>');
 }
 
+const FALLBACK_FULL = `Name: Khing Jay Regala
+Role: IT student and aspiring full stack / web developer
+Email: regalakhing@sac.edu.ph
+Phone: 09382604239
+Location: Mapatag Hamtic Antique
+
+Projects: PhysiqueCheck, SMARTCHOICE, String Builder Portflio, PassGenAI, StudentWellnessGuard, ILOVE YOU VENUS`;
+
 async function fetchBackendReply(message) {
   const endpoints = ['/api/chatbot', '/api/chatbot.php'];
 
@@ -32,6 +40,28 @@ async function fetchBackendReply(message) {
   }
 
   throw new Error('Backend chat endpoint failed.');
+}
+
+function getOfflineReply(message) {
+  const text = message.toLowerCase();
+
+  if (/^\s*(hi|hello|hey|hi po|hello po|hey po)\s*!*\s*$/.test(text)) {
+    return `Hi! I can still help while the API is down.\nAsk me about Khing Jay's projects, skills, email, phone, or location.`;
+  }
+
+  if (/email|mail/.test(text)) return 'Email: regalakhing@sac.edu.ph';
+  if (/phone|number|contact/.test(text)) return 'Phone: 09382604239';
+  if (/location|address|where/.test(text)) return 'Location: Mapatag Hamtic Antique';
+
+  if (/project|projects|portfolio/.test(text)) {
+    return 'Projects: PhysiqueCheck, SMARTCHOICE, String Builder Portflio, PassGenAI, StudentWellnessGuard, ILOVE YOU VENUS';
+  }
+
+  if (/skill|skills|tech/.test(text)) {
+    return 'Skills: Java, Python, JavaScript, C#, HTML, CSS, React, Tailwind CSS, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase';
+  }
+
+  return `${FALLBACK_FULL}\n\n(API is currently unavailable, so this is offline profile data.)`;
 }
 
 export function initChatbot() {
@@ -109,7 +139,7 @@ export function initChatbot() {
     } catch (error) {
       loadingDiv.remove();
       console.error('Chat Error:', error);
-      appendMessage('model', 'Chat service is unavailable right now. Please try again in a moment.');
+      appendMessage('model', getOfflineReply(text));
     }
   }
 
