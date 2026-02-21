@@ -160,6 +160,9 @@ export function initChatbot() {
 
   chatClose.addEventListener('click', () => setChatOpen(false));
 
+  // Ensure chatbot starts closed on initial page load.
+  setChatOpen(false);
+
   async function handleSendMessage() {
     const text = chatInput.value.trim();
     if (!text) return;
