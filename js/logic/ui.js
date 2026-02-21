@@ -1,0 +1,323 @@
+import { SKILLS, PROJECTS, designProjects, editingProjects, certificates, awards, techStack } from './data.js';
+
+export function initUI() {
+  lucide.createIcons();
+  renderSkills();
+  renderGrid('Projects', 'Project');
+  setupScrollAnimations();
+  setupNavbarAndTheme();
+  setupProjectFilters();
+  setupLightbox();
+  setupDemoModal();
+}
+
+function setupNavbarAndTheme() {
+  const navbar = document.getElementById('navbar');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      navbar.classList.add('bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-md', 'shadow-lg');
+      navbar.classList.remove('bg-transparent', 'py-6');
+      navbar.classList.add('py-4');
+    } else {
+      navbar.classList.remove('bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-md', 'shadow-lg', 'py-4');
+      navbar.classList.add('bg-transparent', 'py-6');
+    }
+
+    const sections = ['home', 'about', 'projects', 'contact'];
+    let current = '';
+
+    sections.forEach((section) => {
+      const element = document.getElementById(section);
+      if (!element) return;
+      const rect = element.getBoundingClientRect();
+      if (rect.top <= 150 && rect.bottom >= 150) current = section;
+    });
+
+    document.querySelectorAll('.nav-item').forEach((link) => {
+      link.classList.remove('text-blue-600', 'dark:text-blue-400');
+      link.classList.add('text-gray-700', 'dark:text-gray-300');
+      if (link.getAttribute('data-target') === current) {
+        link.classList.remove('text-gray-700', 'dark:text-gray-300');
+        link.classList.add('text-blue-600', 'dark:text-blue-400');
+      }
+    });
+  });
+
+  document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+    menuIcon.classList.toggle('hidden');
+    closeIcon.classList.toggle('hidden');
+  });
+
+  const themeToggles = [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')];
+  themeToggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+  });
+
+  if (localStorage.getItem('theme') === 'light') {
+    document.documentElement.classList.remove('dark');
+  }
+}
+
+function renderSkills() {
+  const container = document.getElementById('skills-container');
+  const categories = [
+    { label: 'Programming Languages', icon: 'code-2', filter: 'Programming' },
+    { label: 'Web Development', icon: 'globe', filter: 'Web' },
+    { label: 'Tools & Technologies', icon: 'wrench', filter: 'Tools' }
+  ];
+
+  container.innerHTML = categories.map((cat) => {
+    const catSkills = SKILLS.filter((s) => s.category === cat.filter);
+    return `
+      <div class="bg-gray-50 dark:bg-slate-800/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-blue-500/50 transition-colors group">
+        <div class="flex justify-between items-start mb-4">
+          <div class="p-3 bg-white dark:bg-slate-700 rounded-xl shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600 dark:text-blue-400">
+            <i data-lucide="${cat.icon}" class="w-6 h-6"></i>
+          </div>
+          <span class="text-4xl font-bold text-gray-200 dark:text-slate-700 group-hover:text-blue-600/10 transition-colors">${catSkills.length}</span>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">${cat.label}</h3>
+        <div class="flex flex-wrap gap-2">
+          ${catSkills.map((s) => `<span class="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-slate-900 px-2 py-1 rounded border border-gray-200 dark:border-slate-700">${s.name}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+}
+
+function setupProjectFilters() {
+  const projectTabsContainer = document.getElementById('project-tabs');
+
+  document.querySelectorAll('.category-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.category-btn').forEach((b) => {
+        b.classList.remove('bg-blue-600', 'text-white');
+        b.classList.add('text-gray-600', 'dark:text-gray-400');
+      });
+
+      e.currentTarget.classList.remove('text-gray-600', 'dark:text-gray-400');
+      e.currentTarget.classList.add('bg-blue-600', 'text-white');
+
+      const category = e.currentTarget.getAttribute('data-category');
+      if (category === 'Projects') {
+        projectTabsContainer.classList.remove('hidden');
+        renderGrid('Projects', 'Project');
+      } else {
+        projectTabsContainer.classList.add('hidden');
+        renderGrid(category);
+      }
+    });
+  });
+
+  document.querySelectorAll('.project-tab-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.project-tab-btn').forEach((b) => {
+        b.classList.remove('bg-red-500', 'text-white');
+        b.classList.add('text-gray-500');
+      });
+
+      e.currentTarget.classList.remove('text-gray-500');
+      e.currentTarget.classList.add('bg-red-500', 'text-white');
+
+      renderGrid('Projects', e.currentTarget.getAttribute('data-tab'));
+    });
+  });
+}
+
+function renderGrid(category, subTab = null) {
+  const gridContainer = document.getElementById('grid-container');
+  let content = '';
+  let className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8';
+
+  if (category === 'Projects') {
+    if (subTab === 'Project') {
+      content = PROJECTS.map((p) => `
+        <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.imageUrl}')">
+            <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0B1120] to-transparent opacity-60"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 leading-tight group-hover:text-blue-500 transition-colors">${p.title}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">${p.description}</p>
+            <div class="flex flex-wrap gap-2 mt-auto mb-6">
+              ${p.technologies.map((t) => `<span class="px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded-lg">${t}</span>`).join('')}
+            </div>
+            <div class="flex gap-4 pt-4 border-t border-gray-100 dark:border-slate-800">
+              <a href="#" data-demo-url="${p.demoUrl}" class="demo-link text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-4 h-4"></i> Live Demo</a>
+              <a href="${p.codeUrl}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1"><i data-lucide="github" class="w-4 h-4"></i> Source</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (subTab === 'Design') {
+      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-8';
+      content = designProjects.map((p) => `
+        <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.image}')">
+            <img src="${p.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+              <span class="bg-black/50 p-3 rounded-full text-white backdrop-blur-sm"><i data-lucide="eye" class="w-6 h-6"></i></span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-500 transition-colors">${p.title}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">${p.description}</p>
+            <div class="flex flex-wrap gap-2">
+              ${p.tools.map((t) => `<span class="px-3 py-1 text-xs font-medium text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 rounded-lg">${t}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (subTab === 'Editing') {
+      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-8';
+      content = editingProjects.map((p) => `
+        <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.image}')">
+            <img src="${p.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+              <span class="bg-red-600 p-3 rounded-full text-white shadow-lg"><i data-lucide="play-circle" class="w-8 h-8"></i></span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-red-500 transition-colors">${p.title}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">${p.description}</p>
+            <div class="flex flex-wrap gap-2">
+              ${p.tools.map((t) => `<span class="px-3 py-1 text-xs font-medium text-red-600 dark:text-red-300 bg-red-50 dark:bg-red-900/30 rounded-lg">${t}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else if (category === 'Certificates' || category === 'Awards') {
+    const data = category === 'Certificates' ? certificates : awards;
+    const bgBadge = category === 'Certificates'
+      ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
+      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+
+    content = data.map((c) => `
+      <div class="group relative bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl transition-all duration-300">
+        <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${c.image}')">
+          <img src="${c.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <button class="px-6 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg">View</button>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <span class="px-2 py-1 text-xs font-medium ${bgBadge} rounded">${c.issuer}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">${c.date}</span>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">${c.title}</h3>
+        </div>
+      </div>
+    `).join('');
+  } else if (category === 'Tech Stack') {
+    className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4';
+    content = techStack.map((t) => `
+      <div class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#0B1120] rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/50 transition-all duration-300 group">
+        <div class="mb-4 p-3 bg-gray-50 dark:bg-slate-800 rounded-xl group-hover:scale-110 transition-transform duration-300 ${t.color}">
+          <i data-lucide="${t.icon}" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">${t.name}</h3>
+        <span class="text-xs text-gray-500 dark:text-gray-400">${t.level}</span>
+      </div>
+    `).join('');
+  }
+
+  gridContainer.className = className;
+  gridContainer.innerHTML = content;
+  lucide.createIcons();
+}
+
+function setupLightbox() {
+  window.openLightbox = (src) => {
+    const lb = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    img.src = src;
+    lb.classList.remove('hidden');
+    lb.classList.add('flex');
+  };
+
+  document.getElementById('lightbox-close').addEventListener('click', () => {
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('hidden');
+    lb.classList.remove('flex');
+  });
+
+  document.getElementById('lightbox').addEventListener('click', (e) => {
+    if (e.target !== e.currentTarget) return;
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('hidden');
+    lb.classList.remove('flex');
+  });
+}
+
+function setupDemoModal() {
+  const demoModal = document.getElementById('demo-modal');
+  const demoProceedBtn = document.getElementById('demo-proceed-btn');
+  const demoCancelBtn = document.getElementById('demo-cancel-btn');
+  let pendingDemoUrl = null;
+
+  function openDemoModal(url) {
+    pendingDemoUrl = url;
+    demoModal.classList.remove('hidden');
+    demoModal.classList.add('flex');
+  }
+
+  function closeDemoModal() {
+    pendingDemoUrl = null;
+    demoModal.classList.add('hidden');
+    demoModal.classList.remove('flex');
+  }
+
+  demoProceedBtn.addEventListener('click', () => {
+    if (pendingDemoUrl && pendingDemoUrl !== '#') {
+      window.open(pendingDemoUrl, '_blank', 'noopener,noreferrer');
+    }
+    closeDemoModal();
+  });
+
+  demoCancelBtn.addEventListener('click', closeDemoModal);
+  demoModal.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeDemoModal();
+  });
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('.demo-link');
+    if (!link) return;
+
+    e.preventDefault();
+    const url = link.getAttribute('data-demo-url') || '#';
+    if (url === '#') return;
+
+    openDemoModal(url);
+  });
+}
+
+function setupScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.scroll-animate').forEach((el) => observer.observe(el));
+}

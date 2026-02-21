@@ -5,6 +5,7 @@
     }
   },
   "rewrites": [
-    { "source": "/api/send-email", "destination": "/api/send-email.php" }
+    { "source": "/api/send-email", "destination": "/api/send-email.php" },
+    { "source": "/api/chatbot", "destination": "/api/chatbot.php" }
   ]
 }
