@@ -17,28 +17,6 @@ if ($message === '') {
     exit;
 }
 
-$portfolioOnlyReply = 'I can only answer questions about Khing Jay Regala\'s portfolio, such as projects, skills, background, and contact details.';
-
-$keywords = [
-    'portfolio', 'project', 'projects', 'all projects', 'skill', 'skills', 'tech', 'stack', 'about', 'about me', 'all about', 'background',
-    'contact', 'email', 'phone', 'location', 'khing', 'jay', 'regala', 'certificate', 'award',
-    'physiquecheck', 'smartchoice', 'passgenai', 'studentwellnessguard', 'venus', 'details', 'everything', 'full profile'
-];
-
-$lowerMessage = strtolower($message);
-$isPortfolioQuery = false;
-foreach ($keywords as $keyword) {
-    if (strpos($lowerMessage, $keyword) !== false) {
-        $isPortfolioQuery = true;
-        break;
-    }
-}
-
-if (!$isPortfolioQuery) {
-    echo json_encode(['status' => 'success', 'reply' => $portfolioOnlyReply]);
-    exit;
-}
-
 $apiKey = getenv('GROQ_API_KEY');
 if (!$apiKey) {
     http_response_code(500);
@@ -97,7 +75,7 @@ Demo: https://kaisecret.github.io/happy_anniversary/home.html
 Source: https://github.com/Kaisecret/happy_anniversary
 TXT;
 
-$systemPrompt = "You are a strict portfolio assistant for Khing Jay Regala. Only answer questions related to this portfolio data. If user asks for all about/about me/full profile/all projects, provide complete details (contact info, about, and every project with description, tech, and links). If the question is unrelated, reply exactly with: I can only answer questions about Khing Jay Regala's portfolio, such as projects, skills, background, and contact details. Keep responses concise and factual.\n\nPortfolio Data:\n" . $portfolioData;
+$systemPrompt = "You are an AI assistant on Khing Jay Regala's portfolio website. You can answer general questions and portfolio questions. Use the portfolio data below when relevant.\n\nImportant behavior rules:\n1) If user asks for Khing's location, provide: Mapatag Hamtic Antique.\n2) If user asks for YOUR location / AI location, say you do not have a physical location.\n3) Do not confuse AI location with Khing's location.\n4) Be concise and clear.\n\nPortfolio Data:\n" . $portfolioData;
 
 $requestBody = [
     'model' => 'llama-3.3-70b-versatile',
@@ -105,7 +83,7 @@ $requestBody = [
         ['role' => 'system', 'content' => $systemPrompt],
         ['role' => 'user', 'content' => $message]
     ],
-    'temperature' => 0.2,
+    'temperature' => 0.3,
     'max_tokens' => 320
 ];
 

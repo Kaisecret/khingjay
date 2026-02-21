@@ -11,82 +11,6 @@ function formatBotText(text) {
   return escapeHtml(text).replaceAll('\n', '<br>');
 }
 
-const PORTFOLIO_ONLY_REPLY = "I can only answer questions about Khing Jay Regala's portfolio, such as projects, skills, background, and contact details.";
-
-const FULL_PROFILE_REPLY = `Name: Khing Jay Regala
-Role: IT student and aspiring full stack / web developer
-Email: regalakhing@sac.edu.ph
-Phone: 09382604239
-Location: Mapatag Hamtic Antique
-
-About:
-Khing Jay is a creative and multidisciplinary IT student focused on building practical web applications and continuously improving through real projects.
-
-Core Skills:
-Java, Python, JavaScript, C#, HTML, CSS, React, Tailwind CSS, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase
-
-All Projects:
-1) PhysiqueCheck
-Description: A web physique tracking app that uses body photos to analyze muscles and generate personalized workouts and meal guides.
-Tech: Php, MySQL, Python, Tailwind, Pycharm, Vscode, Xampp
-Demo: https://physique-check-git-main-kaisecrets-projects.vercel.app?_vercel_share=eCic6DLuiV43DfRx80clkvsapYbuWYfZ
-Source: https://github.com/Kaisecret/PhisiqueCheck-AI-COACH-ASSISTANT-FOR-BODY
-
-2) SMARTCHOICE
-Description: A web course-planning app that analyzes SHS strand, interests, and skills to recommend best-fit college programs and paths.
-Tech: Php, MySQL, Python, Tailwind, Pycharm, Vscode, Xampp
-Demo: Not available
-Source: Not available
-
-3) String Builder Portflio
-Description: A desktop portfolio and resume generator for students applying for jobs and internships.
-Tech: Neatbens, MySQL, java, Xampp
-Demo: Not available
-Source: Not available
-
-4) PassGenAI
-Description: An AI-powered password generator that creates secure and memorable passwords.
-Tech: React, Tailwind, Supabase
-Demo: https://passgen-ai-murex.vercel.app/
-Source: https://github.com/Kaisecret/PassgenAi
-
-5) StudentWellnessGuard
-Description: An AI-powered tool that analyzes facial cues to detect early signs of fatigue and stress.
-Tech: Php, MySQL, Python, Tailwind, Pycharm, Vscode, Xampp
-Demo: Not available
-Source: Not available
-
-6) ILOVE YOU VENUS
-Description: A simple anniversary website with games, pictures, a heartfelt letter, and a virtual garden.
-Tech: JavaScript, HTML5, Tailwind
-Demo: https://kaisecret.github.io/happy_anniversary/home.html
-Source: https://github.com/Kaisecret/happy_anniversary`;
-
-function isPortfolioQuery(message) {
-  const text = message.toLowerCase();
-  const keywords = [
-    'portfolio', 'project', 'projects', 'all projects', 'skill', 'skills', 'tech', 'stack', 'about', 'about me', 'all about', 'background',
-    'contact', 'email', 'phone', 'location', 'khing', 'jay', 'regala', 'certificate', 'award',
-    'physiquecheck', 'smartchoice', 'passgenai', 'studentwellnessguard', 'venus', 'details', 'everything', 'full profile'
-  ];
-  return keywords.some((word) => text.includes(word));
-}
-
-function wantsFullProfile(message) {
-  const text = message.toLowerCase();
-  const triggers = [
-    'all about',
-    'about me',
-    'full details',
-    'full profile',
-    'everything',
-    'all projects',
-    'all information',
-    'complete profile'
-  ];
-  return triggers.some((phrase) => text.includes(phrase));
-}
-
 async function fetchBackendReply(message) {
   const endpoints = ['/api/chatbot', '/api/chatbot.php'];
 
@@ -164,16 +88,6 @@ export function initChatbot() {
     appendMessage('user', text);
     chatInput.value = '';
 
-    if (!isPortfolioQuery(text)) {
-      appendMessage('model', PORTFOLIO_ONLY_REPLY);
-      return;
-    }
-
-    if (wantsFullProfile(text)) {
-      appendMessage('model', FULL_PROFILE_REPLY);
-      return;
-    }
-
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'flex justify-start loading-indicator';
     loadingDiv.innerHTML = `
@@ -195,7 +109,7 @@ export function initChatbot() {
     } catch (error) {
       loadingDiv.remove();
       console.error('Chat Error:', error);
-      appendMessage('model', 'Chat service is unavailable right now. Please try again after server setup.');
+      appendMessage('model', 'Chat service is unavailable right now. Please try again in a moment.');
     }
   }
 
