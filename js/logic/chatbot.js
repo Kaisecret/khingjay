@@ -64,6 +64,53 @@ function getFriendlyFallback(message) {
   return FALLBACK_FULL;
 }
 
+function shouldTriggerForwardRequest(message) {
+  const text = message.toLowerCase();
+  return /message khing|tell khing|send (this )?to khing|can you message/.test(text);
+}
+
+function extractForwardContent(message) {
+  const fromSay = message.match(/say(?:ing)?\s+(.+)$/i);
+  if (fromSay && fromSay[1]) return fromSay[1].trim();
+
+  const fromThat = message.match(/that\s+(.+)$/i);
+  if (fromThat && fromThat[1]) return fromThat[1].trim();
+
+  return message.trim();
+}
+
+function extractEmail(message) {
+  const match = message.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  return match ? match[0] : '';
+}
+
+async function sendMessageToKhing(senderEmail, forwardedMessage) {
+  const endpoints = ['/api/send-email', '/api/send-email.php'];
+  const formData = new FormData();
+  formData.append('name', 'Chatbot Visitor');
+  formData.append('email', senderEmail);
+  formData.append('message', `[From chatbot]\nSender email: ${senderEmail}\nMessage: ${forwardedMessage}`);
+
+  let lastError = null;
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json().catch(() => null);
+      if (response.ok && result?.status === 'success') {
+        return;
+      }
+      throw new Error(result?.message || `Failed to send via ${endpoint}`);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error('Unable to send message to Khing.');
+}
+
 export function initChatbot() {
   const chatToggle = document.getElementById('chatbot-toggle');
   const chatWindow = document.getElementById('chat-window');
@@ -73,6 +120,8 @@ export function initChatbot() {
   const chatMessages = document.getElementById('chat-messages');
   const chatIcon = document.getElementById('chat-icon');
   const chatCloseIcon = document.getElementById('chat-close-icon');
+  let awaitingSenderEmail = false;
+  let pendingForwardMessage = '';
 
   function appendMessage(role, text) {
     const div = document.createElement('div');
@@ -117,6 +166,59 @@ export function initChatbot() {
 
     appendMessage('user', text);
     chatInput.value = '';
+
+    if (awaitingSenderEmail) {
+      if (/^cancel$/i.test(text)) {
+        awaitingSenderEmail = false;
+        pendingForwardMessage = '';
+        appendMessage('model', 'Message request canceled.');
+        return;
+      }
+
+      const senderEmail = extractEmail(text);
+      if (!senderEmail) {
+        appendMessage('model', 'Please provide a valid email address (or type "cancel").');
+        return;
+      }
+
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'flex justify-start loading-indicator';
+      loadingDiv.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-bl-none border border-gray-200 dark:border-slate-700 shadow-sm">
+          <div class="flex gap-1.5">
+            <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
+            <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-100"></span>
+            <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-200"></span>
+          </div>
+        </div>
+      `;
+      chatMessages.appendChild(loadingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        await sendMessageToKhing(senderEmail, pendingForwardMessage);
+        loadingDiv.remove();
+        appendMessage('model', 'Done. I sent your message to Khing.');
+      } catch (error) {
+        loadingDiv.remove();
+        console.error('Forward Error:', error);
+        appendMessage('model', 'I could not send that message right now. Please try again later.');
+      } finally {
+        awaitingSenderEmail = false;
+        pendingForwardMessage = '';
+      }
+      return;
+    }
+
+    if (shouldTriggerForwardRequest(text)) {
+      pendingForwardMessage = extractForwardContent(text);
+      awaitingSenderEmail = true;
+      appendMessage(
+        'model',
+        `Sure, I can send this to Khing: "${pendingForwardMessage}". Please provide your email first.`
+      );
+      return;
+    }
 
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'flex justify-start loading-indicator';
