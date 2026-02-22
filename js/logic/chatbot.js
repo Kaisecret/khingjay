@@ -119,8 +119,13 @@ export function initChatbot() {
   const chatSend = document.getElementById('chat-send');
   const chatMessages = document.getElementById('chat-messages');
   const chatIcon = document.getElementById('chat-icon');
-  
+  const chatCloseIcon = document.getElementById('chat-close-icon');
   const chatHook = document.getElementById('chatbot-hook');
+
+  if (!chatToggle || !chatWindow || !chatClose || !chatInput || !chatSend || !chatMessages || !chatIcon || !chatCloseIcon) {
+    return;
+  }
+
   let awaitingSenderEmail = false;
   let pendingForwardMessage = '';
 
