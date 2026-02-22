@@ -111,6 +111,14 @@ async function sendMessageToKhing(senderEmail, forwardedMessage) {
   throw lastError || new Error('Unable to send message to Khing.');
 }
 
+function openForwardMailtoFallback(senderEmail, forwardedMessage) {
+  const subject = encodeURIComponent('Chatbot Message for Khing');
+  const body = encodeURIComponent(
+    `Sender email: ${senderEmail}\n\nMessage:\n${forwardedMessage}`
+  );
+  window.location.href = `mailto:regalakhing@sac.edu.ph?subject=${subject}&body=${body}`;
+}
+
 export function initChatbot() {
   const chatToggle = document.getElementById('chatbot-toggle');
   const chatWindow = document.getElementById('chat-window');
@@ -213,7 +221,8 @@ export function initChatbot() {
       } catch (error) {
         loadingDiv.remove();
         console.error('Forward Error:', error);
-        appendMessage('model', 'I could not send that message right now. Please try again later.');
+        openForwardMailtoFallback(senderEmail, pendingForwardMessage);
+        appendMessage('model', 'Server send failed, so I opened your mail app with the message prefilled.');
       } finally {
         awaitingSenderEmail = false;
         pendingForwardMessage = '';
