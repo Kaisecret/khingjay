@@ -119,7 +119,8 @@ export function initChatbot() {
   const chatSend = document.getElementById('chat-send');
   const chatMessages = document.getElementById('chat-messages');
   const chatIcon = document.getElementById('chat-icon');
-  const chatCloseIcon = document.getElementById('chat-close-icon');
+  
+  const chatHook = document.getElementById('chatbot-hook');
   let awaitingSenderEmail = false;
   let pendingForwardMessage = '';
 
@@ -143,6 +144,7 @@ export function initChatbot() {
       chatWindow.classList.add('flex');
       chatIcon.classList.add('hidden');
       chatCloseIcon.classList.remove('hidden');
+      chatHook?.classList.add('hidden');
       setTimeout(() => chatInput.focus(), 300);
       return;
     }
@@ -151,6 +153,7 @@ export function initChatbot() {
     chatWindow.classList.remove('flex');
     chatIcon.classList.remove('hidden');
     chatCloseIcon.classList.add('hidden');
+    chatHook?.classList.remove('hidden');
   }
 
   chatToggle.addEventListener('click', () => {
