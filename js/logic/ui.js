@@ -17,6 +17,56 @@ function setupNavbarAndTheme() {
   const menuIcon = document.getElementById('menu-icon');
   const closeIcon = document.getElementById('close-icon');
 
+  let transitionTimeout;
+  const setAboutProfileImageByTheme = (isTransitioning = false) => {
+    const profileImage = document.getElementById('about-profile-image');
+    const profileVideo = document.getElementById('about-profile-video');
+    if (!profileImage) return;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const nextImageSrc = isDark ? '/animationimages/noglasses pic.png' : '/animationimages/withglasses pic.png';
+    
+    if (transitionTimeout) {
+      clearTimeout(transitionTimeout);
+    }
+
+    if (isTransitioning && profileVideo) {
+      profileVideo.src = isDark
+        ? '/animationimages/removeglassesvid.mp4'
+        : '/animationimages/puttingglassesvid.mp4';
+      
+      // Keep video hidden initially to prevent flickering on fast toggles
+      profileVideo.classList.remove('opacity-100');
+      profileVideo.classList.add('opacity-0');
+      
+      profileVideo.onloadeddata = () => {
+        profileVideo.play().then(() => {
+          // Fade in video once playing
+          profileVideo.classList.remove('opacity-0');
+          profileVideo.classList.add('opacity-100');
+          
+          transitionTimeout = setTimeout(() => {
+            profileImage.src = nextImageSrc;
+          }, 550); // Swap underlying image when video is opaque
+        }).catch(e => {
+          // Ignore AbortError caused by spam toggling
+          if (e.name !== 'AbortError') console.error("Video play failed:", e);
+        });
+      };
+      
+      profileVideo.onended = () => {
+        profileVideo.classList.remove('opacity-100');
+        profileVideo.classList.add('opacity-0');
+      };
+    } else {
+      if (profileVideo) {
+        profileVideo.classList.remove('opacity-100');
+        profileVideo.classList.add('opacity-0');
+      }
+      profileImage.src = nextImageSrc;
+    }
+  };
+
   window.addEventListener('scroll', () => {
     if (window.scrollY > 20) {
       navbar.classList.add('bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-md', 'shadow-lg');
@@ -59,12 +109,15 @@ function setupNavbarAndTheme() {
       document.documentElement.classList.toggle('dark');
       const isDark = document.documentElement.classList.contains('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      setAboutProfileImageByTheme(true);
     });
   });
 
   if (localStorage.getItem('theme') === 'light') {
     document.documentElement.classList.remove('dark');
   }
+
+  setAboutProfileImageByTheme();
 }
 
 function renderSkills() {
