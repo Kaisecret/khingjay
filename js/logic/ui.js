@@ -1,5 +1,8 @@
 import { SKILLS, PROJECTS, designProjects, editingProjects, certificates, awards, techStack } from './data.js';
 
+const INITIAL_PROJECT_LIMIT = 6;
+let visibleProjectLimit = INITIAL_PROJECT_LIMIT;
+
 export function initUI() {
   lucide.createIcons();
   renderSkills();
@@ -67,8 +70,10 @@ function setupNavbarAndTheme() {
     }
   };
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 20) {
+  const handleScrollState = () => {
+    const scrollProgress = window.scrollY;
+
+    if (scrollProgress > 20) {
       navbar.classList.add('bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-md', 'shadow-lg');
       navbar.classList.remove('bg-transparent', 'py-6');
       navbar.classList.add('py-4');
@@ -79,12 +84,13 @@ function setupNavbarAndTheme() {
 
     const sections = ['home', 'about', 'projects', 'contact'];
     let current = '';
+    const activeAnchor = 150;
 
     sections.forEach((section) => {
       const element = document.getElementById(section);
       if (!element) return;
       const rect = element.getBoundingClientRect();
-      if (rect.top <= 150 && rect.bottom >= 150) current = section;
+      if (rect.top <= activeAnchor && rect.bottom >= activeAnchor) current = section;
     });
 
     document.querySelectorAll('.nav-item').forEach((link) => {
@@ -95,12 +101,25 @@ function setupNavbarAndTheme() {
         link.classList.add('text-blue-600', 'dark:text-blue-400');
       }
     });
-  });
+  };
+
+  window.addEventListener('scroll', handleScrollState, { passive: true });
+  handleScrollState();
 
   document.getElementById('mobile-menu-btn').addEventListener('click', () => {
     mobileMenu.classList.toggle('hidden');
     menuIcon.classList.toggle('hidden');
     closeIcon.classList.toggle('hidden');
+  });
+
+  document.querySelectorAll('.nav-item, .mobile-nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (!mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
+    });
   });
 
   const themeToggles = [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')];
@@ -164,6 +183,7 @@ function setupProjectFilters() {
 
       const category = e.currentTarget.getAttribute('data-category');
       if (category === 'Projects') {
+        visibleProjectLimit = INITIAL_PROJECT_LIMIT;
         projectTabsContainer.classList.remove('hidden');
         renderGrid('Projects', 'Project');
       } else {
@@ -183,7 +203,11 @@ function setupProjectFilters() {
       e.currentTarget.classList.remove('text-gray-500');
       e.currentTarget.classList.add('bg-red-500', 'text-white');
 
-      renderGrid('Projects', e.currentTarget.getAttribute('data-tab'));
+      const selectedTab = e.currentTarget.getAttribute('data-tab');
+      if (selectedTab === 'Project') {
+        visibleProjectLimit = INITIAL_PROJECT_LIMIT;
+      }
+      renderGrid('Projects', selectedTab);
     });
   });
 }
@@ -195,7 +219,11 @@ function renderGrid(category, subTab = null) {
 
   if (category === 'Projects') {
     if (subTab === 'Project') {
-      content = PROJECTS.map((p) => `
+      const displayedProjects = PROJECTS.slice(0, visibleProjectLimit);
+      const canToggleProjectCount = PROJECTS.length > INITIAL_PROJECT_LIMIT;
+      const isExpanded = visibleProjectLimit >= PROJECTS.length;
+
+      content = displayedProjects.map((p) => `
         <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.imageUrl}')">
             <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
@@ -214,6 +242,17 @@ function renderGrid(category, subTab = null) {
           </div>
         </div>
       `).join('');
+
+      if (canToggleProjectCount) {
+        content += `
+          <div class="col-span-full flex justify-center">
+            <button id="projects-toggle-btn" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/25">
+              ${isExpanded ? 'Show Less' : 'See More'}
+              <i data-lucide="${isExpanded ? 'chevrons-up' : 'chevrons-down'}" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      }
     }
 
     if (subTab === 'Design') {
@@ -260,23 +299,30 @@ function renderGrid(category, subTab = null) {
   } else if (category === 'Certificates' || category === 'Awards') {
     const data = category === 'Certificates' ? certificates : awards;
     const bgBadge = category === 'Certificates'
-      ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
+      ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300'
       : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+    const isAwards = category === 'Awards';
+    const openLabel = isAwards ? 'Open Award' : 'Open Certificate';
+
+    if (isAwards) {
+      className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8';
+    }
 
     content = data.map((c) => `
-      <div class="group relative bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl transition-all duration-300">
-        <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${c.image}')">
-          <img src="${c.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-          <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <button class="px-6 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg">View</button>
+      <div class="group relative bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="relative ${isAwards ? 'aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${c.image}')">
+          <img src="${c.image}" alt="${c.title}" class="w-full h-full ${isAwards ? 'object-contain bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-4' : 'object-cover'} transform group-hover:scale-[1.02] transition-transform duration-500">
+          <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <button class="px-6 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg">${openLabel}</button>
           </div>
         </div>
-        <div class="p-5">
+        <div class="p-5 ${isAwards ? 'bg-gradient-to-r from-slate-50 to-cyan-50/60 dark:from-slate-900 dark:to-cyan-950/20' : ''}">
           <div class="flex justify-between items-start mb-2">
             <span class="px-2 py-1 text-xs font-medium ${bgBadge} rounded">${c.issuer}</span>
             <span class="text-xs text-gray-500 dark:text-gray-400">${c.date}</span>
           </div>
           <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">${c.title}</h3>
+          ${isAwards ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Click image to view full award</p>' : ''}
         </div>
       </div>
     `).join('');
@@ -285,7 +331,11 @@ function renderGrid(category, subTab = null) {
     content = techStack.map((t) => `
       <div class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#0B1120] rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/50 transition-all duration-300 group">
         <div class="mb-4 p-3 bg-gray-50 dark:bg-slate-800 rounded-xl group-hover:scale-110 transition-transform duration-300 ${t.color}">
-          <i data-lucide="${t.icon}" class="w-8 h-8"></i>
+          ${t.iconUrl
+            ? `<img src="${t.iconUrl}" alt="${t.name} logo" loading="lazy" class="w-8 h-8 object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+               <i data-lucide="${t.icon}" class="w-8 h-8 hidden"></i>`
+            : `<i data-lucide="${t.icon}" class="w-8 h-8"></i>`
+          }
         </div>
         <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">${t.name}</h3>
         <span class="text-xs text-gray-500 dark:text-gray-400">${t.level}</span>
@@ -296,6 +346,15 @@ function renderGrid(category, subTab = null) {
   gridContainer.className = className;
   gridContainer.innerHTML = content;
   lucide.createIcons();
+
+  const projectToggleButton = document.getElementById('projects-toggle-btn');
+  if (projectToggleButton) {
+    projectToggleButton.addEventListener('click', () => {
+      const isExpanded = visibleProjectLimit >= PROJECTS.length;
+      visibleProjectLimit = isExpanded ? INITIAL_PROJECT_LIMIT : PROJECTS.length;
+      renderGrid('Projects', 'Project');
+    });
+  }
 }
 
 function setupLightbox() {

@@ -2,10 +2,14 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.55) transparent;
 }
 
 body {
     font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
 }
 
 code, pre {
@@ -14,17 +18,24 @@ code, pre {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
+    height: 0;
 }
 ::-webkit-scrollbar-track {
-    background: #1e293b;
+    background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #3b82f6;
-    border-radius: 5px;
+    background: rgba(148, 163, 184, 0.55);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #2563eb;
+    background: rgba(148, 163, 184, 0.85);
+    background-clip: content-box;
+}
+::-webkit-scrollbar:horizontal {
+    height: 0;
 }
 
 /* Animation Utilities */
