@@ -1,4 +1,4 @@
-import { SKILLS, PROJECTS, designProjects, editingProjects, certificates, awards, techStack } from './data.js';
+import { SKILLS, PROJECTS, designProjects, certificates, awards, gallery, techStack } from './data.js';
 
 const INITIAL_PROJECT_LIMIT = 6;
 let visibleProjectLimit = INITIAL_PROJECT_LIMIT;
@@ -7,6 +7,7 @@ export function initUI() {
   lucide.createIcons();
   renderSkills();
   renderGrid('Projects', 'Project');
+  renderGallerySection();
   setupScrollAnimations();
   setupNavbarAndTheme();
   setupProjectFilters();
@@ -82,7 +83,7 @@ function setupNavbarAndTheme() {
       navbar.classList.add('bg-transparent', 'py-6');
     }
 
-    const sections = ['home', 'about', 'projects', 'contact'];
+    const sections = ['home', 'about', 'projects', 'gallery', 'contact'];
     let current = '';
     const activeAnchor = 150;
 
@@ -170,46 +171,63 @@ function renderSkills() {
 
 function setupProjectFilters() {
   const projectTabsContainer = document.getElementById('project-tabs');
+  const categoryButtons = Array.from(document.querySelectorAll('.category-btn'));
+  const projectTabButtons = Array.from(document.querySelectorAll('.project-tab-btn'));
 
-  document.querySelectorAll('.category-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.category-btn').forEach((b) => {
-        b.classList.remove('bg-blue-600', 'text-white');
-        b.classList.add('text-gray-600', 'dark:text-gray-400');
-      });
+  const activateProjectTab = (tabName) => {
+    projectTabButtons.forEach((button) => {
+      button.classList.remove('bg-red-500', 'text-white');
+      button.classList.add('text-gray-500');
+    });
 
-      e.currentTarget.classList.remove('text-gray-600', 'dark:text-gray-400');
-      e.currentTarget.classList.add('bg-blue-600', 'text-white');
+    const activeTabButton = projectTabButtons.find((button) => button.getAttribute('data-tab') === tabName);
+    if (activeTabButton) {
+      activeTabButton.classList.remove('text-gray-500');
+      activeTabButton.classList.add('bg-red-500', 'text-white');
+    }
+  };
 
-      const category = e.currentTarget.getAttribute('data-category');
-      if (category === 'Projects') {
-        visibleProjectLimit = INITIAL_PROJECT_LIMIT;
-        projectTabsContainer.classList.remove('hidden');
-        renderGrid('Projects', 'Project');
-      } else {
-        projectTabsContainer.classList.add('hidden');
-        renderGrid(category);
-      }
+  const activateCategory = (category) => {
+    categoryButtons.forEach((button) => {
+      button.classList.remove('bg-blue-600', 'text-white');
+      button.classList.add('text-gray-600', 'dark:text-gray-400');
+    });
+
+    const activeCategoryButton = categoryButtons.find((button) => button.getAttribute('data-category') === category);
+    if (activeCategoryButton) {
+      activeCategoryButton.classList.remove('text-gray-600', 'dark:text-gray-400');
+      activeCategoryButton.classList.add('bg-blue-600', 'text-white');
+    }
+
+    if (category === 'Projects') {
+      visibleProjectLimit = INITIAL_PROJECT_LIMIT;
+      projectTabsContainer.classList.remove('hidden');
+      activateProjectTab('Project');
+      renderGrid('Projects', 'Project');
+    } else {
+      projectTabsContainer.classList.add('hidden');
+      renderGrid(category);
+    }
+  };
+
+  categoryButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const category = btn.getAttribute('data-category');
+      activateCategory(category);
     });
   });
 
-  document.querySelectorAll('.project-tab-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.project-tab-btn').forEach((b) => {
-        b.classList.remove('bg-red-500', 'text-white');
-        b.classList.add('text-gray-500');
-      });
-
-      e.currentTarget.classList.remove('text-gray-500');
-      e.currentTarget.classList.add('bg-red-500', 'text-white');
-
-      const selectedTab = e.currentTarget.getAttribute('data-tab');
+  projectTabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const selectedTab = btn.getAttribute('data-tab');
+      activateProjectTab(selectedTab);
       if (selectedTab === 'Project') {
         visibleProjectLimit = INITIAL_PROJECT_LIMIT;
       }
       renderGrid('Projects', selectedTab);
     });
   });
+
 }
 
 function renderGrid(category, subTab = null) {
@@ -256,46 +274,26 @@ function renderGrid(category, subTab = null) {
     }
 
     if (subTab === 'Design') {
-      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-8';
+      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:max-w-3xl lg:mx-auto gap-6';
       content = designProjects.map((p) => `
-        <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.image}')">
-            <img src="${p.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-              <span class="bg-black/50 p-3 rounded-full text-white backdrop-blur-sm"><i data-lucide="eye" class="w-6 h-6"></i></span>
+        <div class="group max-w-md mx-auto w-full bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="relative aspect-[4/4] overflow-hidden cursor-pointer bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-3" onclick="openLightbox('${p.image}')">
+            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-contain rounded-lg transform group-hover:scale-[1.02] transition-transform duration-500">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/35">
+              <span class="bg-black/60 p-3 rounded-full text-white backdrop-blur-sm border border-white/20"><i data-lucide="eye" class="w-6 h-6"></i></span>
             </div>
           </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-500 transition-colors">${p.title}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">${p.description}</p>
+          <div class="p-5">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-cyan-500 transition-colors">${p.title}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">${p.description}</p>
             <div class="flex flex-wrap gap-2">
-              ${p.tools.map((t) => `<span class="px-3 py-1 text-xs font-medium text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 rounded-lg">${t}</span>`).join('')}
+              ${p.tools.map((t) => `<span class="px-3 py-1 text-xs font-medium text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/25 rounded-lg">${t}</span>`).join('')}
             </div>
           </div>
         </div>
       `).join('');
     }
 
-    if (subTab === 'Editing') {
-      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-8';
-      content = editingProjects.map((p) => `
-        <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.image}')">
-            <img src="${p.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-              <span class="bg-red-600 p-3 rounded-full text-white shadow-lg"><i data-lucide="play-circle" class="w-8 h-8"></i></span>
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-red-500 transition-colors">${p.title}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">${p.description}</p>
-            <div class="flex flex-wrap gap-2">
-              ${p.tools.map((t) => `<span class="px-3 py-1 text-xs font-medium text-red-600 dark:text-red-300 bg-red-50 dark:bg-red-900/30 rounded-lg">${t}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
   } else if (category === 'Certificates' || category === 'Awards') {
     const data = category === 'Certificates' ? certificates : awards;
     const bgBadge = category === 'Certificates'
@@ -355,6 +353,28 @@ function renderGrid(category, subTab = null) {
       renderGrid('Projects', 'Project');
     });
   }
+}
+
+function renderGallerySection() {
+  const galleryContainer = document.getElementById('gallery-grid');
+  if (!galleryContainer) return;
+
+  galleryContainer.innerHTML = gallery.map((item) => `
+    <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${item.image}')">
+        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transform group-hover:scale-[1.03] transition-transform duration-500">
+        <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <span class="px-4 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg text-sm">${item.label}</span>
+        </div>
+      </div>
+      <div class="p-5">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">${item.title}</h3>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Click image to view full photo</p>
+      </div>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
 }
 
 function setupLightbox() {

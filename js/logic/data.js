@@ -19,6 +19,7 @@ export const SKILLS = [
 const imagePath = (fileName) => `/images/${fileName}`;
 const awardPath = (fileName) => `/award/${encodeURIComponent(fileName)}`;
 const certificatePath = (fileName) => `/CERTIFICATE/${encodeURIComponent(fileName)}`;
+const galleryPath = (fileName) => `/gallery/${encodeURIComponent(fileName)}`;
 
 export const PROJECTS = [
   {
@@ -107,17 +108,24 @@ export const PROJECTS = [
 export const designProjects = [
   {
     id: 1,
-    title: 'Travel Mobile App UI',
-    description: 'A modern, user-centric interface design for a travel booking application focusing on ease of use and visual appeal.',
-    tools: ['Figma', 'Prototyping', 'UI/UX'],
-    image: 'https://picsum.photos/seed/design1/600/400'
+    title: 'Cyberian Polo Shirt V1',
+    description: 'A clean and modern apparel concept showcasing the Cyberian polo shirt visual identity with balanced typography, brand contrast, and promotional layout composition.',
+    tools: ['Brand Design', 'Layout', 'Typography'],
+    image: imagePath('Cyberian Polo shirt V1.png')
   },
   {
     id: 2,
-    title: 'Coffee Brand Identity',
-    description: 'Complete visual identity package including logo design, color palette, and packaging mockups for a local roastery.',
-    tools: ['Adobe Illustrator', 'Photoshop', 'Branding'],
-    image: 'https://picsum.photos/seed/design2/600/400'
+    title: 'Cyberian Polo Shirt V2',
+    description: 'An upgraded Cyberian polo concept with a refined composition, stronger product presentation, and improved visual hierarchy for promotional use.',
+    tools: ['Brand Design', 'Mockup Design', 'Typography'],
+    image: imagePath('Cyberian Polo V2.png')
+  },
+  {
+    id: 3,
+    title: 'SAC Fun Run',
+    description: 'A dynamic event design concept for the SAC Fun Run campaign, combining energetic visuals, bold typography, and clear branding for strong promotional impact.',
+    tools: ['Event Design', 'Poster Layout', 'Branding'],
+    image: imagePath('Sac fun run.png')
   }
 ];
 
@@ -148,6 +156,27 @@ export const awards = [
   { id: 3, title: 'Tech Innovator', issuer: 'Award', date: 'Achievement', image: awardPath('Tech innovator.png') },
   { id: 4, title: 'Top Java Programmer', issuer: 'Award', date: 'Achievement', image: awardPath('Top java programmer.png') },
   { id: 5, title: 'Top Pythonista', issuer: 'Award', date: 'Achievement', image: awardPath('Top pythonista.png') }
+];
+
+export const gallery = [
+  {
+    id: 1,
+    title: 'KomsaiHack 2026',
+    label: 'KomsaiHack 2026',
+    image: galleryPath('pic1.jpg')
+  },
+  {
+    id: 2,
+    title: 'KomsaiHack 2026',
+    label: 'KomsaiHack 2026',
+    image: galleryPath('pic2.jpg')
+  },
+  {
+    id: 3,
+    title: 'Profile Photo',
+    label: 'Gallery',
+    image: galleryPath('me.png')
+  }
 ];
 
 export const techStack = [
