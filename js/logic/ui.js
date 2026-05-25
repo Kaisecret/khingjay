@@ -241,10 +241,25 @@ function renderGrid(category, subTab = null) {
       const canToggleProjectCount = PROJECTS.length > INITIAL_PROJECT_LIMIT;
       const isExpanded = visibleProjectLimit >= PROJECTS.length;
 
-      content = displayedProjects.map((p) => `
+      content = displayedProjects.map((p) => {
+        const projectLabel = p.projectLabel || (p.title === 'Meedocentrix Enterprise System'
+          ? 'Enterprise Project'
+          : p.title === 'PassGenAI'
+            ? 'Customize Software'
+            : 'School Project');
+        const projectLabelStyle = projectLabel === 'Enterprise Project'
+          ? 'bg-emerald-500/95 text-white border border-emerald-300/50'
+          : projectLabel === 'Customize Software'
+            ? 'bg-cyan-500/95 text-cyan-950 border border-cyan-200/70'
+            : projectLabel === 'Hackathon'
+              ? 'bg-amber-500/95 text-amber-950 border border-amber-200/80'
+            : 'bg-slate-900/85 text-amber-300 border border-amber-300/35';
+
+        return `
         <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.imageUrl}')">
             <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 px-3 py-1 rounded-md text-[11px] font-semibold tracking-wide uppercase backdrop-blur-sm ${projectLabelStyle}">${projectLabel}</span>
             <div class="absolute inset-0 bg-gradient-to-t from-[#0B1120] to-transparent opacity-60"></div>
           </div>
           <div class="p-6">
@@ -259,7 +274,8 @@ function renderGrid(category, subTab = null) {
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       if (canToggleProjectCount) {
         content += `
@@ -375,7 +391,6 @@ function renderGallerySection() {
       </div>
       <div class="p-5">
         <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">${item.title}</h3>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Click image to view full photo</p>
       </div>
     </div>
   `).join('');
