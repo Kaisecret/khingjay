@@ -151,6 +151,7 @@ export const certificates = [
 ];
 
 export const awards = [
+  { id: 0, title: 'KomsaiHack', issuer: 'Award', date: 'Achievement', image: awardPath('komsaihack.png'), featured: true },
   { id: 1, title: 'HCI', issuer: 'Award', date: 'Achievement', image: awardPath('HCI.png') },
   { id: 2, title: 'Quiz Bee', issuer: 'Award', date: 'Achievement', image: awardPath('quizbee.png') },
   { id: 3, title: 'Tech Innovator', issuer: 'Award', date: 'Achievement', image: awardPath('Tech innovator.png') },

@@ -300,16 +300,22 @@ function renderGrid(category, subTab = null) {
       ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300'
       : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
     const isAwards = category === 'Awards';
+    const isCertificates = category === 'Certificates';
     const openLabel = isAwards ? 'Open Award' : 'Open Certificate';
 
     if (isAwards) {
       className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8';
+    } else if (isCertificates) {
+      className = data.length === 1
+        ? 'grid grid-cols-1 gap-8 max-w-xl mx-auto'
+        : 'grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center';
     }
 
     content = data.map((c) => `
-      <div class="group relative bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      <div class="group relative w-full max-w-xl bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border ${c.featured ? 'border-amber-300/80 dark:border-amber-500/60 ring-1 ring-amber-200/70 dark:ring-amber-500/30' : 'border-gray-100 dark:border-slate-800'} shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div class="relative ${isAwards ? 'aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${c.image}')">
-          <img src="${c.image}" alt="${c.title}" class="w-full h-full ${isAwards ? 'object-contain bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-4' : 'object-cover'} transform group-hover:scale-[1.02] transition-transform duration-500">
+          <img src="${c.image}" alt="${c.title}" class="w-full h-full ${isAwards || isCertificates ? 'object-contain bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-4' : 'object-cover'} transform group-hover:scale-[1.02] transition-transform duration-500">
+          ${c.featured ? '<span class="absolute top-3 left-3 px-3 py-1 text-[11px] font-semibold rounded-full bg-amber-400 text-amber-950 shadow">Featured</span>' : ''}
           <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <button class="px-6 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg">${openLabel}</button>
           </div>
