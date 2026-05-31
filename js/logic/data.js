@@ -171,11 +171,12 @@ export const certificates = [
 
 export const awards = [
   { id: 0, title: 'KomsaiHack', issuer: 'Award', date: 'Achievement', image: awardPath('komsaihack.png'), featured: true },
-  { id: 1, title: 'HCI', issuer: 'Award', date: 'Achievement', image: awardPath('HCI.png') },
-  { id: 2, title: 'Quiz Bee', issuer: 'Award', date: 'Achievement', image: awardPath('quizbee.png') },
-  { id: 3, title: 'Tech Innovator', issuer: 'Award', date: 'Achievement', image: awardPath('Tech innovator.png') },
-  { id: 4, title: 'Top Java Programmer', issuer: 'Award', date: 'Achievement', image: awardPath('Top java programmer.png') },
-  { id: 5, title: 'Top Pythonista', issuer: 'Award', date: 'Achievement', image: awardPath('Top pythonista.png') }
+  { id: 1, title: 'Sikaptala', issuer: 'Award', date: 'Achievement', image: imagePath('sikaptala.png') },
+  { id: 2, title: 'HCI', issuer: 'Award', date: 'Achievement', image: awardPath('HCI.png') },
+  { id: 3, title: 'Quiz Bee', issuer: 'Award', date: 'Achievement', image: awardPath('quizbee.png') },
+  { id: 4, title: 'Tech Innovator', issuer: 'Award', date: 'Achievement', image: awardPath('Tech innovator.png') },
+  { id: 5, title: 'Top Java Programmer', issuer: 'Award', date: 'Achievement', image: awardPath('Top java programmer.png') },
+  { id: 6, title: 'Top Pythonista', issuer: 'Award', date: 'Achievement', image: awardPath('Top pythonista.png') }
 ];
 
 export const gallery = [
