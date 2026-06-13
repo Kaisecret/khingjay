@@ -1,4 +1,5 @@
 import { SKILLS, PROJECTS, designProjects, certificates, awards, gallery, techStack } from './data.js';
+import { createProfileThemeSwapController } from './profileThemeSwap.mjs';
 
 const INITIAL_PROJECT_LIMIT = 6;
 let visibleProjectLimit = INITIAL_PROJECT_LIMIT;
@@ -20,56 +21,16 @@ function setupNavbarAndTheme() {
   const mobileMenu = document.getElementById('mobile-menu');
   const menuIcon = document.getElementById('menu-icon');
   const closeIcon = document.getElementById('close-icon');
-
-  let transitionTimeout;
-  const setAboutProfileImageByTheme = (isTransitioning = false) => {
-    const profileImage = document.getElementById('about-profile-image');
-    const profileVideo = document.getElementById('about-profile-video');
-    if (!profileImage) return;
-
-    const isDark = document.documentElement.classList.contains('dark');
-    const nextImageSrc = isDark ? '/animationimages/noglasses pic.png' : '/animationimages/withglasses pic.png';
-    
-    if (transitionTimeout) {
-      clearTimeout(transitionTimeout);
-    }
-
-    if (isTransitioning && profileVideo) {
-      profileVideo.src = isDark
-        ? '/animationimages/removeglassesvid.mp4'
-        : '/animationimages/puttingglassesvid.mp4';
-      
-      // Keep video hidden initially to prevent flickering on fast toggles
-      profileVideo.classList.remove('opacity-100');
-      profileVideo.classList.add('opacity-0');
-      
-      profileVideo.onloadeddata = () => {
-        profileVideo.play().then(() => {
-          // Fade in video once playing
-          profileVideo.classList.remove('opacity-0');
-          profileVideo.classList.add('opacity-100');
-          
-          transitionTimeout = setTimeout(() => {
-            profileImage.src = nextImageSrc;
-          }, 550); // Swap underlying image when video is opaque
-        }).catch(e => {
-          // Ignore AbortError caused by spam toggling
-          if (e.name !== 'AbortError') console.error("Video play failed:", e);
-        });
-      };
-      
-      profileVideo.onended = () => {
-        profileVideo.classList.remove('opacity-100');
-        profileVideo.classList.add('opacity-0');
-      };
-    } else {
-      if (profileVideo) {
-        profileVideo.classList.remove('opacity-100');
-        profileVideo.classList.add('opacity-0');
-      }
-      profileImage.src = nextImageSrc;
-    }
-  };
+  const profileThemeSwap = createProfileThemeSwapController({
+    root: document.documentElement,
+    storage: window.localStorage,
+    profileImage: document.getElementById('about-profile-image'),
+    profileVideos: {
+      dark: document.getElementById('about-profile-video-dark'),
+      light: document.getElementById('about-profile-video-light')
+    },
+    themeToggles: [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')]
+  });
 
   const handleScrollState = () => {
     const scrollProgress = window.scrollY;
@@ -123,21 +84,13 @@ function setupNavbarAndTheme() {
     });
   });
 
-  const themeToggles = [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')];
-  themeToggles.forEach((toggle) => {
+  [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')].forEach((toggle) => {
     toggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      setAboutProfileImageByTheme(true);
+      profileThemeSwap.toggleTheme();
     });
   });
 
-  if (localStorage.getItem('theme') === 'light') {
-    document.documentElement.classList.remove('dark');
-  }
-
-  setAboutProfileImageByTheme();
+  profileThemeSwap.syncStoredTheme();
 }
 
 function renderSkills() {
