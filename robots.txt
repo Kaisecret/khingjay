@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /phpmailer/
+Disallow: /tests/
+
+Sitemap: https://www.khingjay.tech/sitemap.xml
