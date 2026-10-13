@@ -1,3 +1,20 @@
+/* Fonts: Geist and Geist Mono (latin, SIL Open Font License), hosted with the site so no other server delays first paint */
+@font-face {
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/geist-latin.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Geist Mono';
+    font-style: normal;
+    font-weight: 400 500;
+    font-display: swap;
+    src: url('/fonts/geist-mono-latin.woff2') format('woff2');
+}
+
 /* Design tokens (RGB triplets so Tailwind opacity modifiers work) */
 :root {
     --background: 255 255 255;
