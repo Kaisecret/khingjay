@@ -3,10 +3,10 @@ export const PROFILE_SWAP_PLAY_TIMEOUT_MS = 120;
 
 const PROFILE_MEDIA = {
   dark: {
-    imageSrc: '/animationimages/noglasses pic.png'
+    imageSrc: '/animationimages/noglasses pic.webp'
   },
   light: {
-    imageSrc: '/animationimages/withglasses pic.png'
+    imageSrc: '/animationimages/withglasses pic.webp'
   }
 };
 

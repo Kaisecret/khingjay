@@ -158,7 +158,7 @@ function createHarness({ isDark = true, readyState = 0 } = {}) {
   const timers = new FakeTimers();
   const storage = new FakeStorage();
   const root = { classList: new FakeClassList(isDark ? ['dark'] : []) };
-  const image = { src: isDark ? '/animationimages/noglasses pic.png' : '/animationimages/withglasses pic.png' };
+  const image = { src: isDark ? '/animationimages/noglasses pic.webp' : '/animationimages/withglasses pic.webp' };
   const videos = {
     dark: new FakeVideo(readyState),
     light: new FakeVideo(readyState)
@@ -185,7 +185,7 @@ test('toggles theme instantly and skips the video when it is not already ready',
 
   assert.equal(root.classList.contains('dark'), false);
   assert.equal(storage.getItem('theme'), 'light');
-  assert.equal(image.src, '/animationimages/withglasses pic.png');
+  assert.equal(image.src, '/animationimages/withglasses pic.webp');
   assert.equal(videos.light.playCalls, 0);
   assert.equal(toggles[0].disabled, false);
   assert.equal(toggles[1].disabled, false);
@@ -205,7 +205,7 @@ test('keeps buttons disabled only during an active ready video swap', async () =
   assert.equal(toggles[1].disabled, true);
 
   timers.tick(PROFILE_SWAP_IMAGE_SWAP_DELAY_MS);
-  assert.equal(image.src, '/animationimages/noglasses pic.png');
+  assert.equal(image.src, '/animationimages/noglasses pic.webp');
   assert.equal(toggles[0].disabled, true);
 
   videos.dark.dispatch('ended');
@@ -225,7 +225,7 @@ test('keeps the new profile image after a fast video transition ends', async () 
 
   videos.light.dispatch('ended');
 
-  assert.equal(image.src, '/animationimages/withglasses pic.png');
+  assert.equal(image.src, '/animationimages/withglasses pic.webp');
   assert.equal(videos.light.classList.contains('opacity-100'), false);
 });
 
