@@ -160,10 +160,20 @@ input, textarea {
     opacity: 1;
 }
 
+/* Touch screens: icons only, with a larger icon and tap area */
 @media (hover: none) {
     .icon-link-label {
-        grid-template-columns: 1fr;
-        opacity: 1;
+        display: none;
+    }
+
+    .icon-link {
+        margin: -0.5rem;
+        padding: 0.5rem;
+    }
+
+    .icon-link svg {
+        width: 1.25rem;
+        height: 1.25rem;
     }
 }
 

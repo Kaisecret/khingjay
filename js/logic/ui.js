@@ -9,6 +9,7 @@ const THEME_REVEAL_DURATION_MS = 850;
 const THEME_REVEAL_EASING = 'cubic-bezier(0.65, 0, 0.35, 1)';
 const THEME_FADE_DURATION_MS = 350;
 const HEADER_REVEAL_SCROLL_Y = 60;
+const PROFILE_VIDEO_WARM_UP_DELAY_MS = 800;
 const SKILL_CATEGORIES = [
   { label: 'Programming Languages', icon: 'code-2', filter: 'Programming' },
   { label: 'Web & Mobile Development', icon: 'globe', filter: 'Web' },
@@ -119,6 +120,22 @@ function setupNavbarAndTheme() {
     },
     themeToggles: [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')]
   });
+
+  // Swap videos are the heaviest files on the page: fetch them only after the page itself has loaded.
+  const warmUpProfileVideos = () => {
+    window.setTimeout(() => {
+      document.querySelectorAll('#about-profile-video-dark, #about-profile-video-light').forEach((video) => {
+        video.preload = 'auto';
+        video.load();
+      });
+    }, PROFILE_VIDEO_WARM_UP_DELAY_MS);
+  };
+
+  if (document.readyState === 'complete') {
+    warmUpProfileVideos();
+  } else {
+    window.addEventListener('load', warmUpProfileVideos, { once: true });
+  }
 
   const handleScrollState = () => {
     const scrollProgress = window.scrollY;
