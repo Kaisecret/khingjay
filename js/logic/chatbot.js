@@ -12,7 +12,7 @@ function formatBotText(text) {
 }
 
 const FALLBACK_FULL = `Name: Khing Jay Regala
-Role: IT student and aspiring full stack / web developer
+Role: Full stack developer with an AI-driven workflow
 Email: regalakhing@sac.edu.ph
 Phone: 09382604239
 Location: Mapatag Hamtic Antique
@@ -58,7 +58,7 @@ function getFriendlyFallback(message) {
   }
 
   if (/skill|skills|tech/.test(text)) {
-    return 'Skills: Java, Python, JavaScript, C#, HTML, CSS, React, Tailwind CSS, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase';
+    return 'Skills: Java, Python, JavaScript, C#, Dart, HTML, CSS, React, Next.js, Tailwind CSS, Flutter, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase, Claude, Codex, Antigravity';
   }
 
   return FALLBACK_FULL;
@@ -142,8 +142,8 @@ export function initChatbot() {
     div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
     div.innerHTML = `
       <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${role === 'user'
-        ? 'bg-blue-600 text-white rounded-br-none'
-        : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 rounded-bl-none shadow-sm'}">
+        ? 'bg-foreground text-background rounded-br-none'
+        : 'bg-surface text-soft border border-line rounded-bl-none'}">
         ${role === 'user' ? escapeHtml(text) : formatBotText(text)}
       </div>
     `;
@@ -203,11 +203,11 @@ export function initChatbot() {
       const loadingDiv = document.createElement('div');
       loadingDiv.className = 'flex justify-start loading-indicator';
       loadingDiv.innerHTML = `
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-bl-none border border-gray-200 dark:border-slate-700 shadow-sm">
+        <div class="bg-surface p-4 rounded-2xl rounded-bl-none border border-line">
           <div class="flex gap-1.5">
-            <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
-            <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-100"></span>
-            <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-200"></span>
+            <span class="w-2 h-2 bg-muted rounded-full animate-pulse"></span>
+            <span class="w-2 h-2 bg-muted rounded-full animate-pulse" style="animation-delay: 150ms"></span>
+            <span class="w-2 h-2 bg-muted rounded-full animate-pulse" style="animation-delay: 300ms"></span>
           </div>
         </div>
       `;
@@ -245,9 +245,9 @@ export function initChatbot() {
     loadingDiv.innerHTML = `
       <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-bl-none border border-gray-200 dark:border-slate-700 shadow-sm">
         <div class="flex gap-1.5">
-          <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
-          <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-100"></span>
-          <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-200"></span>
+          <span class="w-2 h-2 bg-muted rounded-full animate-pulse"></span>
+          <span class="w-2 h-2 bg-muted rounded-full animate-pulse" style="animation-delay: 150ms"></span>
+          <span class="w-2 h-2 bg-muted rounded-full animate-pulse" style="animation-delay: 300ms"></span>
         </div>
       </div>
     `;

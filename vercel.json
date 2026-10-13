@@ -4,8 +4,29 @@
       "runtime": "vercel-php@0.7.4"
     }
   },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "khingjay.vercel.app" }],
+      "destination": "https://www.khingjay.tech/:path*",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(images|gallery|award|CERTIFICATE|animationimages)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/htmlfiles/index.html" },
+    { "source": "/experience", "destination": "/htmlfiles/experience.html" },
+    { "source": "/experience.html", "destination": "/htmlfiles/experience.html" },
+    { "source": "/project.html", "destination": "/htmlfiles/project.html" },
+    { "source": "/tech-stack", "destination": "/htmlfiles/tech-stack.html" },
+    { "source": "/tech-stack.html", "destination": "/htmlfiles/tech-stack.html" },
     { "source": "/api/send-email", "destination": "/api/send-email.php" },
     { "source": "/api/chatbot", "destination": "/api/chatbot.php" }
   ]

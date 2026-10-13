@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tech Stack | Khing Jay Regala</title>
+    <meta name="description" content="Languages, frameworks, and tools used by Khing Jay Regala, a full stack developer from Hamtic, Antique, Philippines." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.khingjay.tech/tech-stack" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.khingjay.tech/tech-stack" />
+    <meta property="og:site_name" content="Khing Jay Regala" />
+    <meta property="og:title" content="Tech Stack | Khing Jay Regala" />
+    <meta property="og:description" content="Languages, frameworks, and tools used by Khing Jay Regala." />
+    <meta property="og:image" content="https://www.khingjay.tech/images/xing%20(1).png" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/png" href="/images/xing%20(1).png">
+    <link rel="apple-touch-icon" href="/images/xing%20(1).png">
+
+    <!-- Light is the default theme; restore a saved dark choice before first paint -->
+    <script>
+      try {
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+      } catch (error) {}
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Styles: tailwind.css is prebuilt from the classes used in htmlfiles/ and js/ (see tailwind.config.js) -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
+
+    <!-- Lucide Icons: deferred so it never blocks first paint; still runs before the page module -->
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@1.56.0/dist/umd/lucide.min.js"></script>
+    <link rel="modulepreload" href="/js/tech-stack.js">
+    <link rel="modulepreload" href="/js/logic/ui.js">
+    <link rel="modulepreload" href="/js/logic/data.js">
+    <link rel="modulepreload" href="/js/logic/profileThemeSwap.mjs">
+</head>
+<body class="bg-background text-foreground">
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-background/85 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-5 sm:px-8">
+            <div class="flex h-14 items-center justify-between gap-4">
+
+                <!-- Logo -->
+                <a href="./" class="nav-link nav-reveal flex items-center gap-2.5 font-semibold tracking-tight">
+                    <img src="/images/xing (1).png" alt="" class="w-6 h-6 object-contain">
+                    <span>Khing Jay</span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-2 text-sm text-soft">
+                    <div class="nav-reveal flex items-center gap-1.5">
+                        <a href="./" class="nav-item link" data-target="home">home</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="experience.html" class="nav-item link" data-target="experience">experience</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="./#projects" class="nav-item link" data-target="projects">portfolio</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="./#gallery" class="nav-item link" data-target="gallery">gallery</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="./#contact" class="nav-item link" data-target="contact">contact</a>
+                    </div>
+
+                    <a href="./#contact" class="nav-reveal btn btn-solid ml-2">Hire Me</a>
+
+                    <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                        <i data-lucide="moon" class="w-[18px] h-[18px] hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-[18px] h-[18px] block dark:hidden"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center gap-1">
+                    <button id="mobile-menu-btn" class="nav-reveal icon-btn" aria-label="Toggle Menu">
+                        <i data-lucide="menu" class="w-5 h-5" id="menu-icon"></i>
+                        <i data-lucide="x" class="w-5 h-5 hidden" id="close-icon"></i>
+                    </button>
+                    <button id="mobile-theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                        <i data-lucide="moon" class="w-[18px] h-[18px] hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-[18px] h-[18px] block dark:hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full border-y border-line bg-background">
+            <div class="flex flex-col px-5 py-3 text-soft">
+                <a href="./" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">home</a>
+                <a href="experience.html" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">experience</a>
+                <a href="./#projects" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">portfolio</a>
+                <a href="./#gallery" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">gallery</a>
+                <a href="./#contact" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">contact</a>
+                <a href="./#contact" class="mobile-nav-link btn btn-solid mt-2 mb-1">Hire Me</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-5 sm:px-8 pt-14">
+        <!-- Tech Stack Page -->
+        <section id="tech-stack" class="pt-2 sm:pt-4">
+            <a href="./#tech-stack" class="hero-in btn btn-outline">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i> Back to home
+            </a>
+
+            <div class="hero-in mt-8" style="animation-delay: 80ms">
+                <h1 class="text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Tech stack.</h1>
+                <p class="mt-4 max-w-[60ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">
+                    Languages, frameworks, and tools I use to build and automate.
+                </p>
+            </div>
+
+            <div id="tech-stack-groups" class="hero-in mt-10 space-y-10" style="animation-delay: 160ms">
+                <!-- Skill groups with brand icons rendered here by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 md:mt-10 border-t border-line">
+        <div class="max-w-5xl mx-auto px-5 sm:px-8 py-8">
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <a href="./" class="inline-flex items-center gap-2.5 font-semibold tracking-tight">
+                        <img src="/images/xing (1).png" alt="" class="w-6 h-6 object-contain">
+                        <span>Khing Jay</span>
+                    </a>
+                    <p class="mt-2 max-w-md text-sm text-soft">
+                        Building modern web experiences with clean design, smart logic, and real-world impact.
+                    </p>
+                </div>
+
+                <div class="-ml-3 flex items-center gap-1 sm:ml-0 sm:-mr-3">
+                    <a href="https://github.com/Kaisecret" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="icon-btn">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" class="w-4 h-4 fill-current">
+                            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.7 7.7 0 0 1 8 4.77a7.7 7.7 0 0 1 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+                        </svg>
+                    </a>
+                    <a href="mailto:regalakhing@sac.edu.ph" aria-label="Email" class="icon-btn">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                    </a>
+                    <a href="#tech-stack" aria-label="Back to top" class="icon-btn">
+                        <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Tech Stack JS -->
+    <script type="module" src="/js/tech-stack.js"></script>
+</body>
+</html>

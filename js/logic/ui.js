@@ -1,11 +1,25 @@
-import { SKILLS, PROJECTS, designProjects, certificates, awards, gallery, techStack } from './data.js';
+import { SKILLS, EXPERIENCE, PROJECT_EXPERIENCE, EDUCATION, ACHIEVEMENTS, PROJECTS, TECH_ICONS, designProjects, certificates, awards, gallery, techStack } from './data.js';
 import { createProfileThemeSwapController } from './profileThemeSwap.mjs';
 
 const INITIAL_PROJECT_LIMIT = 6;
+const INITIAL_EXPERIENCE_LIMIT = 1;
+const EXPERIENCE_PAGE_URL = 'experience.html';
+const PROJECT_PAGE_URL = 'project.html';
+const THEME_REVEAL_DURATION_MS = 850;
+const THEME_REVEAL_EASING = 'cubic-bezier(0.65, 0, 0.35, 1)';
+const THEME_FADE_DURATION_MS = 350;
+const HEADER_REVEAL_SCROLL_Y = 60;
+const SKILL_CATEGORIES = [
+  { label: 'Programming Languages', icon: 'code-2', filter: 'Programming' },
+  { label: 'Web & Mobile Development', icon: 'globe', filter: 'Web' },
+  { label: 'Tools & Technologies', icon: 'wrench', filter: 'Tools' },
+  { label: 'AI Tools', icon: 'sparkles', filter: 'AI' }
+];
 let visibleProjectLimit = INITIAL_PROJECT_LIMIT;
 
 export function initUI() {
   lucide.createIcons();
+  renderExperience();
   renderSkills();
   renderGrid('Projects', 'Project');
   renderGallerySection();
@@ -14,6 +28,80 @@ export function initUI() {
   setupProjectFilters();
   setupLightbox();
   setupDemoModal();
+}
+
+export function initExperiencePage() {
+  lucide.createIcons();
+  renderExperiencePage();
+  setupNavbarAndTheme();
+}
+
+export function initTechStackPage() {
+  lucide.createIcons();
+  renderTechStackPage();
+  setupNavbarAndTheme();
+}
+
+export function initProjectPage() {
+  lucide.createIcons();
+  renderProjectPage();
+  setupNavbarAndTheme();
+  setupDemoModal();
+}
+
+function runThemeTransition(toggle, applyTheme) {
+  const root = document.documentElement;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    applyTheme();
+    return;
+  }
+
+  if (typeof document.startViewTransition !== 'function') {
+    root.classList.add('theme-fade');
+    applyTheme();
+    window.setTimeout(() => root.classList.remove('theme-fade'), THEME_FADE_DURATION_MS);
+    return;
+  }
+
+  const rect = toggle.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  // Two squares grow toward each other: one from the toggle, one from the point mirrored across the screen.
+  const mirrorX = width - x;
+  const mirrorY = height - y;
+  // Smallest half-size where both squares together cover the viewport (they meet side by side or top to bottom).
+  const reachSideBySide = Math.max(y, height - y, Math.min(x, width - x), Math.abs(x - width / 2));
+  const reachTopToBottom = Math.max(x, width - x, Math.min(y, height - y), Math.abs(y - height / 2));
+  const reach = Math.min(reachSideBySide, reachTopToBottom);
+  const squaresAt = (half) => {
+    const corners = (centerX, centerY) => [
+      [centerX - half, centerY - half],
+      [centerX + half, centerY - half],
+      [centerX + half, centerY + half],
+      [centerX - half, centerY + half],
+      [centerX - half, centerY - half]
+    ];
+    // One polygon holds both squares; the hop between them has no area.
+    const points = [...corners(x, y), ...corners(mirrorX, mirrorY)];
+    return `polygon(${points.map(([pointX, pointY]) => `${pointX}px ${pointY}px`).join(', ')})`;
+  };
+
+  root.classList.add('theme-switching');
+  const transition = document.startViewTransition(() => {
+    applyTheme();
+  });
+
+  transition.ready.then(() => {
+    root.animate(
+      { clipPath: [squaresAt(0), squaresAt(reach)] },
+      { duration: THEME_REVEAL_DURATION_MS, easing: THEME_REVEAL_EASING, pseudoElement: '::view-transition-new(root)' }
+    );
+  }).catch(() => {});
+
+  transition.finished.catch(() => {}).then(() => root.classList.remove('theme-switching'));
 }
 
 function setupNavbarAndTheme() {
@@ -35,16 +123,17 @@ function setupNavbarAndTheme() {
   const handleScrollState = () => {
     const scrollProgress = window.scrollY;
 
-    if (scrollProgress > 20) {
-      navbar.classList.add('bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-md', 'shadow-lg');
-      navbar.classList.remove('bg-transparent', 'py-6');
-      navbar.classList.add('py-4');
-    } else {
-      navbar.classList.remove('bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-md', 'shadow-lg', 'py-4');
-      navbar.classList.add('bg-transparent', 'py-6');
+    // Header stays hidden at the top of the page; only the theme toggle shows there.
+    const isHeaderVisible = scrollProgress > HEADER_REVEAL_SCROLL_Y;
+    navbar.classList.toggle('is-scrolled', isHeaderVisible);
+
+    if (!isHeaderVisible && !mobileMenu.classList.contains('hidden')) {
+      mobileMenu.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
     }
 
-    const sections = ['home', 'about', 'projects', 'gallery', 'contact'];
+    const sections = ['home', 'experience', 'projects', 'gallery', 'contact'];
     let current = '';
     const activeAnchor = 150;
 
@@ -56,12 +145,7 @@ function setupNavbarAndTheme() {
     });
 
     document.querySelectorAll('.nav-item').forEach((link) => {
-      link.classList.remove('text-blue-600', 'dark:text-blue-400');
-      link.classList.add('text-gray-700', 'dark:text-gray-300');
-      if (link.getAttribute('data-target') === current) {
-        link.classList.remove('text-gray-700', 'dark:text-gray-300');
-        link.classList.add('text-blue-600', 'dark:text-blue-400');
-      }
+      link.classList.toggle('is-active', link.getAttribute('data-target') === current);
     });
   };
 
@@ -86,36 +170,164 @@ function setupNavbarAndTheme() {
 
   [document.getElementById('theme-toggle'), document.getElementById('mobile-theme-toggle')].forEach((toggle) => {
     toggle.addEventListener('click', () => {
-      profileThemeSwap.toggleTheme();
+      runThemeTransition(toggle, () => {
+        profileThemeSwap.toggleTheme();
+      });
     });
   });
 
   profileThemeSwap.syncStoredTheme();
 }
 
+function renderTimelineItem(item, { isFull = false } = {}) {
+  const separator = ' <span aria-hidden="true">&bull;</span> ';
+
+  return `
+    <li ${isFull && item.id ? `id="${item.id}"` : ''} class="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3 sm:items-start sm:gap-x-6">
+      <span class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-soft">
+        <i data-lucide="${item.icon}" class="w-[18px] h-[18px]"></i>
+      </span>
+      <div class="min-w-0">
+        <p class="font-semibold leading-snug text-soft">${item.organization}</p>
+        <p class="mt-0.5 text-sm text-muted">${item.meta.join(separator)}</p>
+      </div>
+      <span class="hidden sm:block mt-2 w-px justify-self-center self-stretch bg-line"></span>
+      <div class="col-span-2 min-w-0 pt-3 ${isFull ? 'pb-10' : 'pb-2'} sm:col-span-1">
+        <h3 class="text-lg font-semibold tracking-tight leading-snug">${item.role}</h3>
+        <p class="mt-0.5 text-sm text-muted tabular-nums">${[item.period, item.duration].filter(Boolean).join(separator)}</p>
+        ${item.detail ? `<p class="mt-3 max-w-[65ch] text-pretty">${item.detail}</p>` : ''}
+        ${isFull ? '' : `<a href="${EXPERIENCE_PAGE_URL}#${item.id}" class="link mt-3 text-sm text-muted">See more</a>`}
+      </div>
+    </li>
+  `;
+}
+
+function renderExperience() {
+  document.getElementById('experience-list').innerHTML = EXPERIENCE
+    .slice(0, INITIAL_EXPERIENCE_LIMIT)
+    .map((item) => renderTimelineItem(item))
+    .join('');
+
+  lucide.createIcons();
+}
+
+function renderExperiencePage() {
+  const renderFullList = (items) => items.map((item) => renderTimelineItem(item, { isFull: true })).join('');
+
+  document.getElementById('experience-list').innerHTML = renderFullList(EXPERIENCE);
+  document.getElementById('project-experience-list').innerHTML = renderFullList(PROJECT_EXPERIENCE);
+  document.getElementById('education-list').innerHTML = renderFullList(EDUCATION);
+
+  document.getElementById('achievements-list').innerHTML = ACHIEVEMENTS.map((achievement) => `
+    <li class="flex items-baseline justify-between gap-4 border-b border-line py-3">
+      <span>${achievement.title}</span>
+      <span class="shrink-0 font-mono text-xs text-muted tabular-nums">${achievement.year}</span>
+    </li>
+  `).join('');
+
+  lucide.createIcons();
+}
+
+const GITHUB_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true" class="w-[18px] h-[18px] fill-current"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.7 7.7 0 0 1 8 4.77a7.7 7.7 0 0 1 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path></svg>';
+
+function getProjectSlug(project) {
+  return project.title.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getProjectLabel(project) {
+  return project.projectLabel || (project.title === 'Meedocentrix Enterprise System'
+    ? 'Enterprise Project'
+    : project.title === 'PassGenAI'
+      ? 'Customize Software'
+      : 'School Project');
+}
+
+function renderTechIcon(name, { isDecorative = false } = {}) {
+  const iconUrl = TECH_ICONS[name];
+  if (!iconUrl) return '';
+
+  return `<img src="${iconUrl}" alt="${isDecorative ? '' : name}" ${isDecorative ? '' : `title="${name}"`} loading="lazy" class="tech-icon w-[18px] h-[18px]">`;
+}
+
+function renderProjectPage() {
+  const container = document.getElementById('project-detail');
+  const slug = new URLSearchParams(window.location.search).get('p');
+  const project = PROJECTS.find((candidate) => getProjectSlug(candidate) === slug);
+
+  if (!project) {
+    container.innerHTML = `
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Project not found.</h1>
+      <p class="mt-4 max-w-[65ch] text-base sm:text-lg text-soft">This project link does not match any project. Go back to see all projects.</p>
+    `;
+    return;
+  }
+
+  document.title = `${project.title} | Khing Jay Regala`;
+
+  const links = [
+    project.demoUrl !== '#' ? `<a href="#" data-demo-url="${project.demoUrl}" class="demo-link link !inline-flex items-center gap-1.5"><i data-lucide="external-link" class="w-[18px] h-[18px]"></i> demo</a>` : '',
+    project.codeUrl !== '#' ? `<a href="${project.codeUrl}" target="_blank" rel="noopener noreferrer" class="link !inline-flex items-center gap-1.5">${GITHUB_ICON} repo</a>` : ''
+  ].filter(Boolean);
+
+  container.innerHTML = `
+    <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+      <p class="font-medium">${[getProjectLabel(project), project.period].filter(Boolean).join(' <span aria-hidden="true">&bull;</span> ')}</p>
+      ${links.length ? `<p class="flex items-center gap-2">${links.join('<span class="text-muted" aria-hidden="true">/</span>')}</p>` : ''}
+    </div>
+    <h1 class="mt-4 text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-balance">${project.title}</h1>
+    <p class="mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${project.description}</p>
+    <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2.5 font-medium">
+      ${project.technologies.map((name) => `<li class="inline-flex items-center gap-2">${renderTechIcon(name, { isDecorative: true })}${name}</li>`).join('')}
+    </ul>
+    <a href="${project.imageUrl}" target="_blank" rel="noopener noreferrer" class="mt-8 block overflow-hidden rounded-xl border border-line bg-surface cursor-zoom-in" aria-label="Open full image of ${project.title}">
+      <img src="${project.imageUrl}" alt="Screenshot of ${project.title}" class="w-full h-auto">
+    </a>
+  `;
+
+  lucide.createIcons();
+}
+
 function renderSkills() {
   const container = document.getElementById('skills-container');
-  const categories = [
-    { label: 'Programming Languages', icon: 'code-2', filter: 'Programming' },
-    { label: 'Web Development', icon: 'globe', filter: 'Web' },
-    { label: 'Tools & Technologies', icon: 'wrench', filter: 'Tools' }
-  ];
 
-  container.innerHTML = categories.map((cat) => {
+  container.innerHTML = SKILL_CATEGORIES.map((cat) => {
     const catSkills = SKILLS.filter((s) => s.category === cat.filter);
     return `
-      <div class="bg-gray-50 dark:bg-slate-800/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-blue-500/50 transition-colors group">
-        <div class="flex justify-between items-start mb-4">
-          <div class="p-3 bg-white dark:bg-slate-700 rounded-xl shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600 dark:text-blue-400">
-            <i data-lucide="${cat.icon}" class="w-6 h-6"></i>
-          </div>
-          <span class="text-4xl font-bold text-gray-200 dark:text-slate-700 group-hover:text-blue-600/10 transition-colors">${catSkills.length}</span>
+      <div class="border-t border-line py-5">
+        <div class="flex items-center gap-2 mb-3">
+          <i data-lucide="${cat.icon}" class="w-4 h-4 text-muted"></i>
+          <h3 class="text-sm font-semibold tracking-tight">${cat.label}</h3>
+          <span class="ml-auto font-mono text-xs text-muted tabular-nums">${catSkills.length}</span>
         </div>
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">${cat.label}</h3>
         <div class="flex flex-wrap gap-2">
-          ${catSkills.map((s) => `<span class="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-slate-900 px-2 py-1 rounded border border-gray-200 dark:border-slate-700">${s.name}</span>`).join('')}
+          ${catSkills.map((s) => `<span class="tag">${s.name}</span>`).join('')}
         </div>
       </div>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+}
+
+function renderTechStackPage() {
+  document.getElementById('tech-stack-groups').innerHTML = SKILL_CATEGORIES.map((cat) => {
+    const catSkills = SKILLS.filter((s) => s.category === cat.filter);
+    return `
+      <section>
+        <div class="flex items-center gap-2 border-b border-line pb-3">
+          <i data-lucide="${cat.icon}" class="w-4 h-4 text-muted"></i>
+          <h2 class="text-lg font-semibold tracking-tight">${cat.label}</h2>
+          <span class="ml-auto font-mono text-xs text-muted tabular-nums">${catSkills.length}</span>
+        </div>
+        <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          ${catSkills.map((s) => `
+            <li class="flex items-center gap-3 rounded-lg border border-line bg-card px-3.5 py-3">
+              <img src="${s.iconUrl}" alt="" loading="lazy" class="w-7 h-7 shrink-0 object-contain ${s.invertInDark ? 'dark:invert' : ''}">
+              <span class="min-w-0 font-medium leading-snug">${s.name}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </section>
     `;
   }).join('');
 
@@ -129,28 +341,18 @@ function setupProjectFilters() {
 
   const activateProjectTab = (tabName) => {
     projectTabButtons.forEach((button) => {
-      button.classList.remove('bg-red-500', 'text-white');
-      button.classList.add('text-gray-500');
+      const isActive = button.getAttribute('data-tab') === tabName;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
     });
-
-    const activeTabButton = projectTabButtons.find((button) => button.getAttribute('data-tab') === tabName);
-    if (activeTabButton) {
-      activeTabButton.classList.remove('text-gray-500');
-      activeTabButton.classList.add('bg-red-500', 'text-white');
-    }
   };
 
   const activateCategory = (category) => {
     categoryButtons.forEach((button) => {
-      button.classList.remove('bg-blue-600', 'text-white');
-      button.classList.add('text-gray-600', 'dark:text-gray-400');
+      const isActive = button.getAttribute('data-category') === category;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
     });
-
-    const activeCategoryButton = categoryButtons.find((button) => button.getAttribute('data-category') === category);
-    if (activeCategoryButton) {
-      activeCategoryButton.classList.remove('text-gray-600', 'dark:text-gray-400');
-      activeCategoryButton.classList.add('bg-blue-600', 'text-white');
-    }
 
     if (category === 'Projects') {
       visibleProjectLimit = INITIAL_PROJECT_LIMIT;
@@ -186,7 +388,7 @@ function setupProjectFilters() {
 function renderGrid(category, subTab = null) {
   const gridContainer = document.getElementById('grid-container');
   let content = '';
-  let className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8';
+  let className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
 
   if (category === 'Projects') {
     if (subTab === 'Project') {
@@ -194,46 +396,27 @@ function renderGrid(category, subTab = null) {
       const canToggleProjectCount = PROJECTS.length > INITIAL_PROJECT_LIMIT;
       const isExpanded = visibleProjectLimit >= PROJECTS.length;
 
-      content = displayedProjects.map((p) => {
-        const projectLabel = p.projectLabel || (p.title === 'Meedocentrix Enterprise System'
-          ? 'Enterprise Project'
-          : p.title === 'PassGenAI'
-            ? 'Customize Software'
-            : 'School Project');
-        const projectLabelStyle = projectLabel === 'Enterprise Project'
-          ? 'bg-emerald-500/95 text-white border border-emerald-300/50'
-          : projectLabel === 'Customize Software'
-            ? 'bg-cyan-500/95 text-cyan-950 border border-cyan-200/70'
-            : projectLabel === 'Hackathon'
-              ? 'bg-amber-500/95 text-amber-950 border border-amber-200/80'
-            : 'bg-slate-900/85 text-amber-300 border border-amber-300/35';
-
-        return `
-        <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${p.imageUrl}')">
-            <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-            <span class="absolute top-3 left-3 px-3 py-1 rounded-md text-[11px] font-semibold tracking-wide uppercase backdrop-blur-sm ${projectLabelStyle}">${projectLabel}</span>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0B1120] to-transparent opacity-60"></div>
+      content = displayedProjects.map((p) => `
+        <article class="card p-4">
+          <div class="aspect-video overflow-hidden rounded-md border border-line bg-surface">
+            <img src="${p.imageUrl}" alt="" loading="lazy" class="card-thumb w-full h-full object-cover">
           </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 leading-tight group-hover:text-blue-500 transition-colors">${p.title}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">${p.description}</p>
-            <div class="flex flex-wrap gap-2 mt-auto mb-6">
-              ${p.technologies.map((t) => `<span class="px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded-lg">${t}</span>`).join('')}
-            </div>
-            <div class="flex gap-4 pt-4 border-t border-gray-100 dark:border-slate-800">
-              <a href="#" data-demo-url="${p.demoUrl}" class="demo-link text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-4 h-4"></i> Live Demo</a>
-              <a href="${p.codeUrl}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1"><i data-lucide="github" class="w-4 h-4"></i> Source</a>
-            </div>
+          <h3 class="mt-4 text-lg font-semibold tracking-tight leading-snug text-balance">
+            <a href="${PROJECT_PAGE_URL}?p=${getProjectSlug(p)}" class="after:absolute after:inset-0">${p.title}</a>
+          </h3>
+          <p class="mt-1.5 text-soft line-clamp-2">${p.description}</p>
+          <div class="mt-auto flex flex-wrap items-center gap-3 pt-4 text-muted">
+            ${p.demoUrl !== '#' ? `<a href="#" data-demo-url="${p.demoUrl}" class="demo-link relative z-10 -m-1.5 p-1.5 transition-colors hover:text-foreground" aria-label="Live demo of ${p.title}"><i data-lucide="external-link" class="w-[18px] h-[18px]"></i></a>` : ''}
+            ${p.codeUrl !== '#' ? `<a href="${p.codeUrl}" target="_blank" rel="noopener noreferrer" class="relative z-10 -m-1.5 p-1.5 transition-colors hover:text-foreground" aria-label="Source code of ${p.title}">${GITHUB_ICON}</a>` : ''}
+            ${p.technologies.map((name) => renderTechIcon(name)).join('')}
           </div>
-        </div>
-      `;
-      }).join('');
+        </article>
+      `).join('');
 
       if (canToggleProjectCount) {
         content += `
           <div class="col-span-full flex justify-center">
-            <button id="projects-toggle-btn" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/25">
+            <button id="projects-toggle-btn" class="btn btn-outline">
               ${isExpanded ? 'Show Less' : 'See More'}
               <i data-lucide="${isExpanded ? 'chevrons-up' : 'chevrons-down'}" class="w-4 h-4"></i>
             </button>
@@ -243,20 +426,18 @@ function renderGrid(category, subTab = null) {
     }
 
     if (subTab === 'Design') {
-      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:max-w-3xl lg:mx-auto gap-6';
+      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
       content = designProjects.map((p) => `
-        <div class="group max-w-md mx-auto w-full bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="relative aspect-[4/4] overflow-hidden cursor-pointer bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-3" onclick="openLightbox('${p.image}')">
-            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-contain rounded-lg transform group-hover:scale-[1.02] transition-transform duration-500">
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/35">
-              <span class="bg-black/60 p-3 rounded-full text-white backdrop-blur-sm border border-white/20"><i data-lucide="eye" class="w-6 h-6"></i></span>
-            </div>
+        <div class="card">
+          <div class="relative aspect-[4/4] overflow-hidden border-b border-line bg-surface cursor-zoom-in p-3" onclick="openLightbox('${p.image}')">
+            <img src="${p.image}" alt="${p.title}" loading="lazy" class="card-thumb w-full h-full object-contain rounded-md">
+            <span class="card-hint tag absolute bottom-3 right-3 gap-1.5 bg-card text-foreground"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View</span>
           </div>
-          <div class="p-5">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-cyan-500 transition-colors">${p.title}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">${p.description}</p>
-            <div class="flex flex-wrap gap-2">
-              ${p.tools.map((t) => `<span class="px-3 py-1 text-xs font-medium text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/25 rounded-lg">${t}</span>`).join('')}
+          <div class="flex flex-1 flex-col p-4">
+            <h3 class="font-semibold tracking-tight leading-snug text-balance">${p.title}</h3>
+            <p class="mt-1.5 text-sm text-soft line-clamp-3">${p.description}</p>
+            <div class="flex flex-wrap gap-1.5 mt-4">
+              ${p.tools.map((t) => `<span class="tag">${t}</span>`).join('')}
             </div>
           </div>
         </div>
@@ -265,53 +446,48 @@ function renderGrid(category, subTab = null) {
 
   } else if (category === 'Certificates' || category === 'Awards') {
     const data = category === 'Certificates' ? certificates : awards;
-    const bgBadge = category === 'Certificates'
-      ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300'
-      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
     const isAwards = category === 'Awards';
     const isCertificates = category === 'Certificates';
     const openLabel = isAwards ? 'Open Award' : 'Open Certificate';
 
     if (isAwards) {
-      className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8';
+      className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
     } else if (isCertificates) {
       className = data.length === 1
-        ? 'grid grid-cols-1 gap-8 max-w-xl mx-auto'
-        : 'grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center';
+        ? 'grid grid-cols-1 gap-6 max-w-xl'
+        : 'grid grid-cols-1 md:grid-cols-2 gap-6';
     }
 
     content = data.map((c) => `
-      <div class="group relative w-full max-w-xl bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border ${c.featured ? 'border-amber-300/80 dark:border-amber-500/60 ring-1 ring-amber-200/70 dark:ring-amber-500/30' : 'border-gray-100 dark:border-slate-800'} shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-        <div class="relative ${isAwards ? 'aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${c.image}')">
-          <img src="${c.image}" alt="${c.title}" class="w-full h-full ${isAwards || isCertificates ? 'object-contain bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-4' : 'object-cover'} transform group-hover:scale-[1.02] transition-transform duration-500">
-          ${c.featured ? '<span class="absolute top-3 left-3 px-3 py-1 text-[11px] font-semibold rounded-full bg-amber-400 text-amber-950 shadow">Featured</span>' : ''}
-          <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <button class="px-6 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg">${openLabel}</button>
-          </div>
+      <div class="card w-full">
+        <div class="relative ${isAwards ? 'aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden border-b border-line bg-surface cursor-zoom-in" onclick="openLightbox('${c.image}')">
+          <img src="${c.image}" alt="${c.title}" loading="lazy" class="card-thumb w-full h-full ${isAwards || isCertificates ? 'object-contain p-4' : 'object-cover'}">
+          ${c.featured ? '<span class="tag absolute top-3 left-3 gap-1.5 bg-card text-foreground"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span>Featured</span>' : ''}
+          <span class="card-hint tag absolute bottom-3 right-3 bg-card text-foreground">${openLabel}</span>
         </div>
-        <div class="p-5 ${isAwards ? 'bg-gradient-to-r from-slate-50 to-cyan-50/60 dark:from-slate-900 dark:to-cyan-950/20' : ''}">
-          <div class="flex justify-between items-start mb-2">
-            <span class="px-2 py-1 text-xs font-medium ${bgBadge} rounded">${c.issuer}</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">${c.date}</span>
+        <div class="p-4">
+          <div class="flex justify-between items-center mb-2 font-mono text-xs text-muted">
+            <span>${c.issuer}</span>
+            <span>${c.date}</span>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">${c.title}</h3>
-          ${isAwards ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Click image to view full award</p>' : ''}
+          <h3 class="font-semibold tracking-tight leading-snug">${c.title}</h3>
+          ${isAwards ? '<p class="mt-1.5 text-xs text-muted">Click image to view full award</p>' : ''}
         </div>
       </div>
     `).join('');
   } else if (category === 'Tech Stack') {
-    className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4';
+    className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 border-t border-line';
     content = techStack.map((t) => `
-      <div class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#0B1120] rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/50 transition-all duration-300 group">
-        <div class="mb-4 p-3 bg-gray-50 dark:bg-slate-800 rounded-xl group-hover:scale-110 transition-transform duration-300 ${t.color}">
+      <div class="flex items-center gap-3 border-b border-line py-3.5">
+        <div class="shrink-0 ${t.color}">
           ${t.iconUrl
-            ? `<img src="${t.iconUrl}" alt="${t.name} logo" loading="lazy" class="w-8 h-8 object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-               <i data-lucide="${t.icon}" class="w-8 h-8 hidden"></i>`
-            : `<i data-lucide="${t.icon}" class="w-8 h-8"></i>`
+            ? `<img src="${t.iconUrl}" alt="${t.name} logo" loading="lazy" class="w-6 h-6 object-contain ${t.invertInDark ? 'dark:invert' : ''}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+               <i data-lucide="${t.icon}" class="w-6 h-6 hidden"></i>`
+            : `<i data-lucide="${t.icon}" class="w-6 h-6"></i>`
           }
         </div>
-        <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">${t.name}</h3>
-        <span class="text-xs text-gray-500 dark:text-gray-400">${t.level}</span>
+        <h3 class="font-medium text-sm">${t.name}</h3>
+        <span class="ml-auto font-mono text-xs text-muted">${t.level}</span>
       </div>
     `).join('');
   }
@@ -335,15 +511,13 @@ function renderGallerySection() {
   if (!galleryContainer) return;
 
   galleryContainer.innerHTML = gallery.map((item) => `
-    <div class="group bg-white dark:bg-[#0B1120] rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-      <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-slate-800 cursor-pointer" onclick="openLightbox('${item.image}')">
-        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transform group-hover:scale-[1.03] transition-transform duration-500">
-        <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <span class="px-4 py-2 bg-white text-gray-900 rounded-full font-semibold shadow-lg text-sm">${item.label}</span>
-        </div>
+    <div class="card">
+      <div class="relative aspect-[4/3] overflow-hidden border-b border-line bg-surface cursor-zoom-in" onclick="openLightbox('${item.image}')">
+        <img src="${item.image}" alt="${item.title}" loading="lazy" class="card-thumb w-full h-full object-cover">
+        <span class="card-hint tag absolute bottom-3 right-3 bg-card text-foreground">${item.label}</span>
       </div>
-      <div class="p-5">
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">${item.title}</h3>
+      <div class="p-4">
+        <h3 class="font-semibold tracking-tight leading-snug">${item.title}</h3>
       </div>
     </div>
   `).join('');
@@ -421,9 +595,12 @@ function setupScrollAnimations() {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add('animate-in');
+        observer.unobserve(entry.target);
+      } else {
+        entry.target.classList.add('reveal-pending');
       }
     });
-  }, { threshold: 0.1 });
+  }, { rootMargin: '0px 0px -10% 0px' });
 
   document.querySelectorAll('.scroll-animate').forEach((el) => observer.observe(el));
 }

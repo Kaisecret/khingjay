@@ -26,16 +26,16 @@ if (!$apiKey) {
 
 $portfolioData = <<<TXT
 Name: Khing Jay Regala
-Role: IT student and aspiring full stack / web developer
+Role: Full stack developer with an AI-driven workflow
 Email: regalakhing@sac.edu.ph
 Phone: 09382604239
 Location: Mapatag Hamtic Antique
 
 About:
-Khing Jay is a creative and multidisciplinary IT student focused on building practical web applications and continuously improving through real projects.
+Khing Jay is a full stack developer with an AI-driven workflow who enjoys solving problems, is always willing to learn, and collaborates well with a team. Khing Jay specializes in databases, AI workflows, and automation.
 
 Core Skills:
-Java, Python, JavaScript, C#, HTML, CSS, React, Tailwind CSS, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase
+Java, Python, JavaScript, C#, Dart, HTML, CSS, React, Next.js, Tailwind CSS, Flutter, Git, GitHub, NetBeans, VS Code, PyCharm, XAMPP, Supabase, Claude, Codex, Antigravity
 
 Projects:
 1) PhysiqueCheck

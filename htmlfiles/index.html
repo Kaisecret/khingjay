@@ -1,6 +1,5 @@
-<!-- index.html (FULL FILE with Demo Modal added - everything else unchanged) -->
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,415 +27,313 @@
     </script>
     <link rel="icon" type="image/png" href="/images/xing%20(1).png">
     <link rel="apple-touch-icon" href="/images/xing%20(1).png">
-    <link rel="preload" href="/animationimages/removeglassesvid.mp4" as="video" type="video/mp4">
-    <link rel="preload" href="/animationimages/puttingglassesvid.mp4" as="video" type="video/mp4">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Light is the default theme; restore a saved dark choice before first paint -->
     <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: {
-                50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
-                400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
-                800: '#1e40af', 900: '#1e3a8a', 950: '#172554',
-              }
-            },
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              mono: ['Fira Code', 'monospace'],
-            },
-            animation: {
-              'blob': 'blob 7s infinite',
-              'fade-in': 'fadeIn 0.6s ease-out forwards',
-            },
-            keyframes: {
-              blob: {
-                '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                '100%': { transform: 'translate(0px, 0px) scale(1)' },
-              },
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              }
-            }
-          },
-        },
-      }
+      try {
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+      } catch (error) {}
     </script>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+    <!-- Styles: tailwind.css is prebuilt from the classes used in htmlfiles/ and js/ (see tailwind.config.js) -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
+
+    <!-- Lucide Icons: deferred so it never blocks first paint; still runs before the page module -->
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@1.56.0/dist/umd/lucide.min.js"></script>
+    <link rel="modulepreload" href="/js/main.js">
+    <link rel="modulepreload" href="/js/logic/ui.js">
+    <link rel="modulepreload" href="/js/logic/data.js">
+    <link rel="modulepreload" href="/js/logic/profileThemeSwap.mjs">
+    <link rel="modulepreload" href="/js/logic/chatbot.js">
+    <link rel="modulepreload" href="/js/logic/contact.js">
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300">
+<body class="bg-background text-foreground">
 
     <!-- Navbar -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
-                
+    <nav id="navbar" class="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-background/85 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-5 sm:px-8">
+            <div class="flex h-14 items-center justify-between gap-4">
+
                 <!-- Logo -->
-                <a href="#home" class="flex items-center space-x-3 group nav-link">
-                    <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/10 to-cyan-500/10 dark:from-blue-500/10 dark:to-cyan-400/10 border border-blue-100 dark:border-blue-900/50 group-hover:scale-105 transition-transform duration-300">
-                        <img src="/images/xing (1).png" alt="Logo" class="w-7 h-7 object-contain">
-                    </div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300">
-                        Khing Jay
-                    </span>
+                <a href="#home" class="nav-link nav-reveal flex items-center gap-2.5 font-semibold tracking-tight">
+                    <img src="/images/xing (1).png" alt="" class="w-6 h-6 object-contain">
+                    <span>Khing Jay</span>
                 </a>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center md:max-lg:space-x-5 lg:space-x-6 xl:space-x-8">
-                    <a href="#home" class="nav-item md:max-lg:text-sm font-medium transition-all duration-300 relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400" data-target="home">Home</a>
-                    <a href="#about" class="nav-item md:max-lg:text-sm font-medium transition-all duration-300 relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400" data-target="about">About</a>
-                    <a href="#projects" class="nav-item md:max-lg:text-sm font-medium transition-all duration-300 relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400" data-target="projects">Portfolio</a>
-                    <a href="#gallery" class="nav-item md:max-lg:text-sm font-medium transition-all duration-300 relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400" data-target="gallery">Gallery</a>
-                    <a href="#contact" class="nav-item md:max-lg:text-sm font-medium transition-all duration-300 relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400" data-target="contact">Contact</a>
-                    
-                    <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Theme">
-                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                <div class="hidden md:flex items-center gap-2 text-sm text-soft">
+                    <div class="nav-reveal flex items-center gap-1.5">
+                        <a href="#home" class="nav-item link" data-target="home">home</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="#experience" class="nav-item link" data-target="experience">experience</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="#projects" class="nav-item link" data-target="projects">portfolio</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="#gallery" class="nav-item link" data-target="gallery">gallery</a>
+                        <span class="text-muted/60" aria-hidden="true">/</span>
+                        <a href="#contact" class="nav-item link" data-target="contact">contact</a>
+                    </div>
+
+                    <a href="#contact" class="nav-reveal btn btn-solid ml-2">Hire Me</a>
+
+                    <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                        <i data-lucide="moon" class="w-[18px] h-[18px] hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-[18px] h-[18px] block dark:hidden"></i>
                     </button>
-                    
-                    <a href="#contact" class="px-5 py-2.5 md:max-lg:px-4 md:max-lg:py-2 md:max-lg:text-sm bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5">
-                        Hire Me
-                    </a>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center space-x-4">
-                    <button id="mobile-theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-gray-300">
-                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                <div class="md:hidden flex items-center gap-1">
+                    <button id="mobile-menu-btn" class="nav-reveal icon-btn" aria-label="Toggle Menu">
+                        <i data-lucide="menu" class="w-5 h-5" id="menu-icon"></i>
+                        <i data-lucide="x" class="w-5 h-5 hidden" id="close-icon"></i>
                     </button>
-                    <button id="mobile-menu-btn" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                        <i data-lucide="menu" class="w-7 h-7" id="menu-icon"></i>
-                        <i data-lucide="x" class="w-7 h-7 hidden" id="close-icon"></i>
+                    <button id="mobile-theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                        <i data-lucide="moon" class="w-[18px] h-[18px] hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-[18px] h-[18px] block dark:hidden"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Mobile Navigation Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-t border-gray-200 dark:border-slate-800">
-            <div class="flex flex-col p-4 space-y-4">
-                <a href="#home" class="mobile-nav-link font-medium py-2 px-4 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">Home</a>
-                <a href="#about" class="mobile-nav-link font-medium py-2 px-4 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">About</a>
-                <a href="#projects" class="mobile-nav-link font-medium py-2 px-4 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">Portfolio</a>
-                <a href="#gallery" class="mobile-nav-link font-medium py-2 px-4 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">Gallery</a>
-                <a href="#contact" class="mobile-nav-link font-medium py-2 px-4 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">Contact</a>
-                <a href="#contact" class="text-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all">
-                    Hire Me
-                </a>
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full border-y border-line bg-background">
+            <div class="flex flex-col px-5 py-3 text-soft">
+                <a href="#home" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">home</a>
+                <a href="#experience" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">experience</a>
+                <a href="#projects" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">portfolio</a>
+                <a href="#gallery" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">gallery</a>
+                <a href="#contact" class="mobile-nav-link py-2.5 transition-colors hover:text-foreground">contact</a>
+                <a href="#contact" class="mobile-nav-link btn btn-solid mt-2 mb-1">Hire Me</a>
             </div>
         </div>
     </nav>
 
-    <main>
+    <main class="max-w-5xl mx-auto px-5 sm:px-8 pt-14">
         <!-- Hero Section -->
-        <section id="home" class="relative min-h-screen flex items-center md:max-lg:items-center pt-20 md:max-lg:pt-28 overflow-hidden bg-gray-50 dark:bg-slate-900">
-            <div class="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-blob pointer-events-none"></div>
-            <div class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+        <section id="home" class="pt-2">
+            <div class="grid grid-cols-1 items-center gap-x-5 gap-y-4 min-[360px]:grid-cols-[auto_minmax(0,1fr)] sm:gap-x-8 md:gap-x-10">
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                    
-                    <!-- Left Column -->
-                    <div class="opacity-0 scroll-animate text-left md:max-lg:text-center max-w-2xl md:max-lg:max-w-3xl md:max-lg:mx-auto md:max-lg:mt-[46px] space-y-5 sm:space-y-6 md:max-lg:space-y-7 lg:space-y-7">
-                        <h2 class="text-sm sm:text-base md:max-lg:text-lg font-semibold text-blue-600 dark:text-blue-400 tracking-[0.16em] uppercase">Khing Jay Regala</h2>
-                        <h1 class="text-4xl sm:text-5xl md:max-lg:text-6xl lg:text-6xl font-black text-gray-900 dark:text-white leading-[1.08] sm:leading-[1.04] tracking-[-0.02em]">
-                            Full Stack <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Developer</span>
-                        </h1>
-                        <p class="text-base sm:text-lg md:max-lg:text-2xl text-gray-600 dark:text-gray-300 max-w-[38rem] md:max-lg:max-w-[42rem] md:max-lg:mx-auto leading-8 md:max-lg:leading-10">
-                            A creative and multidisciplinary IT student with a passion for transforming ideas into exceptional visual and functional experiences. I specialize in designing, building, and deploying intuitive web applications.
-                        </p>
-                        <div class="grid grid-cols-4 gap-2 sm:flex sm:flex-wrap sm:gap-3 md:max-lg:justify-center">
-                            <!-- Tech Pills -->
-                             <span class="w-full sm:w-auto text-center px-2 sm:px-4 md:max-lg:px-5 py-2 md:max-lg:py-2.5 rounded-full bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm md:max-lg:text-base font-medium border border-gray-200 dark:border-slate-700 shadow-sm whitespace-nowrap">PHP</span>
-                             <span class="w-full sm:w-auto text-center px-2 sm:px-4 md:max-lg:px-5 py-2 md:max-lg:py-2.5 rounded-full bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm md:max-lg:text-base font-medium border border-gray-200 dark:border-slate-700 shadow-sm whitespace-nowrap">Python</span>
-                             <span class="w-full sm:w-auto text-center px-2 sm:px-4 md:max-lg:px-5 py-2 md:max-lg:py-2.5 rounded-full bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm md:max-lg:text-base font-medium border border-gray-200 dark:border-slate-700 shadow-sm whitespace-nowrap">JavaScript</span>
-                             <span class="w-full sm:w-auto text-center px-2 sm:px-4 md:max-lg:px-5 py-2 md:max-lg:py-2.5 rounded-full bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm md:max-lg:text-base font-medium border border-gray-200 dark:border-slate-700 shadow-sm whitespace-nowrap">Tailwind</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-4 md:max-lg:justify-center">
-                            <a href="#projects" class="group relative inline-flex w-full sm:w-auto justify-center items-center px-4 sm:px-8 md:max-lg:px-10 py-3.5 md:max-lg:py-4 bg-blue-600 text-white text-sm sm:text-base md:max-lg:text-lg font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 overflow-hidden">
-                                <span class="relative z-10 flex items-center gap-2">Projects <i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
-                            </a>
-                            <a href="#contact" class="group inline-flex w-full sm:w-auto justify-center items-center px-4 sm:px-8 md:max-lg:px-10 py-3.5 md:max-lg:py-4 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm sm:text-base md:max-lg:text-lg border border-gray-200 dark:border-slate-700 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all hover:-translate-y-1 shadow-sm">
-                                <span class="flex items-center gap-2">Contact <i data-lucide="mail" class="w-4 h-4"></i></span>
-                            </a>
-                        </div>
+                <!-- Profile portrait (image + theme swap videos) -->
+                <div class="hero-in relative w-32 min-[360px]:w-28 sm:w-[12.5rem] aspect-[11/15] sm:row-span-2 rounded-xl sm:rounded-2xl p-1 border border-line bg-card">
+                    <div class="w-full h-full rounded-lg sm:rounded-xl overflow-hidden relative z-10 bg-surface">
+                        <img id="about-profile-image" src="/animationimages/withglasses pic.png" alt="Profile photo" fetchpriority="high" class="w-full h-full object-cover transform hover:scale-110 transition-all duration-700 ease-in-out z-10 relative">
+                        <video id="about-profile-video-dark" class="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-150 ease-out pointer-events-none z-20" muted playsinline preload="auto" src="/animationimages/removeglassesvid.mp4"></video>
+                        <video id="about-profile-video-light" class="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-150 ease-out pointer-events-none z-20" muted playsinline preload="auto" src="/animationimages/puttingglassesvid.mp4"></video>
                     </div>
+                </div>
 
-                    <!-- Right Column (Dashboard Visual) -->
-                    <div class="relative hidden lg:block opacity-0 scroll-animate delay-200">
-                        <div class="relative bg-[#0B1120] rounded-3xl border border-slate-800 shadow-2xl overflow-hidden p-6 max-w-lg mx-auto transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                            <!-- Header -->
-                            <div class="flex justify-between items-center mb-6">
-                                <div class="flex items-center gap-2">
-                                    <span class="relative flex h-2.5 w-2.5">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                                    </span>
-                                    <span class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">System Online</span>
-                                </div>
-                                <div class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">IT Core</div>
-                            </div>
-                            <!-- Code Content -->
-                            <div class="relative z-10">
-                                <div class="absolute -top-3 -left-2 px-3 py-1 bg-slate-800 rounded-full border border-slate-700 text-[10px] text-blue-400 font-mono flex items-center gap-1 shadow-lg">
-                                    <i data-lucide="terminal" class="w-3 h-3"></i> CLI Shell
-                                </div>
-                                <div class="mt-4 bg-slate-900/80 rounded-xl border border-slate-800 p-5 backdrop-blur-md shadow-inner h-64 flex flex-col justify-between">
-                                    <div class="space-y-3">
-                                        <div class="flex items-center gap-2 text-xs text-slate-500 border-b border-slate-800 pb-2 mb-2 font-mono">
-                                            <span class="text-blue-500">~/build</span> /app
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div class="space-y-2">
-                                                <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-[80%] rounded-full animate-pulse"></div></div>
-                                                <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-[60%] rounded-full opacity-60"></div></div>
-                                                <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-[40%] rounded-full opacity-40"></div></div>
-                                            </div>
-                                            <div class="bg-slate-950 rounded border border-slate-800 p-2 font-mono text-[10px]">
-                                                <div class="text-slate-500 mb-1 flex items-center gap-1"><i data-lucide="cpu" class="w-3 h-3"></i> RUNTIME</div>
-                                                <div class="text-green-400">> build success</div>
-                                                <div class="text-blue-400">> deploying...</div>
-                                                <div class="text-slate-500 animate-pulse">_</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-in min-w-0 sm:self-end" style="animation-delay: 80ms">
+                    <h1 class="text-3xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-balance">Khing Jay Regala</h1>
+                    <p class="mt-2 sm:mt-3 text-base sm:text-lg font-medium text-soft">Full Stack Developer</p>
+                    <p class="mt-1.5 sm:mt-2 flex items-center gap-1.5 text-sm text-muted">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 shrink-0"></i> Hamtic, Antique, Philippines
+                    </p>
+                </div>
+
+                <!-- Contact links -->
+                <ul class="hero-in flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-soft min-[360px]:col-span-2 sm:col-span-1 sm:col-start-2 sm:self-start" style="animation-delay: 80ms">
+                    <li>
+                        <a href="mailto:regalakhing@sac.edu.ph" class="icon-link link !inline-flex items-center gap-1.5" aria-label="Email Khing Jay Regala">
+                            <i data-lucide="mail" class="w-4 h-4 shrink-0"></i>
+                            <span class="icon-link-label"><span>regalakhing@sac.edu.ph</span></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/Kaisecret" target="_blank" rel="noopener noreferrer" class="icon-link link !inline-flex items-center gap-1.5" aria-label="Khing Jay Regala on GitHub">
+                            <svg viewBox="0 0 16 16" aria-hidden="true" class="w-4 h-4 shrink-0 fill-current">
+                                <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.7 7.7 0 0 1 8 4.77a7.7 7.7 0 0 1 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+                            </svg>
+                            <span class="icon-link-label"><span>GitHub</span></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="tel:09382604239" class="icon-link link !inline-flex items-center gap-1.5" aria-label="Call Khing Jay Regala">
+                            <i data-lucide="phone" class="w-4 h-4 shrink-0"></i>
+                            <span class="icon-link-label"><span>09382604239</span></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="hero-in mt-8 space-y-5" style="animation-delay: 160ms">
+                <p class="max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">
+                    A full stack developer with an AI-driven workflow who enjoys solving problems, is always willing to learn, and collaborates well with a team. I specialize in databases, AI workflows, and automation.
+                </p>
+                <ul class="flex flex-wrap gap-2">
+                    <!-- Tech Pills -->
+                    <li class="tag">PHP</li>
+                    <li class="tag">Python</li>
+                    <li class="tag">JavaScript</li>
+                    <li class="tag">Tailwind</li>
+                </ul>
+                <div class="flex flex-wrap gap-3">
+                    <a href="#projects" class="btn btn-solid">Projects <i data-lucide="arrow-down" class="w-4 h-4"></i></a>
+                    <a href="#contact" class="btn btn-outline">Contact <i data-lucide="mail" class="w-4 h-4"></i></a>
                 </div>
             </div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="py-24 bg-white dark:bg-slate-900 relative overflow-hidden">
-            <div class="absolute top-1/4 right-0 translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20">
-                    <div class="opacity-0 scroll-animate order-2 lg:order-1">
-                        <span class="inline-block py-1 px-3 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-4">About Me</span>
-                        <h2 class="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">My Journey in Tech</span>
-                        </h2>
-                        <div class="space-y-5 text-gray-600 dark:text-gray-300 text-base sm:text-lg leading-8 sm:leading-relaxed mb-8 text-left">
-                            <p>I actively explore different technologies from web development to desktop, backend, and mobile app development continuously improving my skills through hands-on projects, experimentation, and learning.</p>
-                            <p>Each project I build is an opportunity to optimize workflows, enhance user experience, and apply best practices in real-world scenarios.</p>
-                        </div>
-                        <div class="relative p-5 sm:p-6 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 mb-8 overflow-hidden group">
-                            <div class="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
-                            <div class="relative z-10 flex items-start gap-3 sm:gap-4">
-                                <i data-lucide="quote" class="w-7 h-7 sm:w-8 sm:h-8 text-blue-500/30 flex-shrink-0 mt-1"></i>
-                                <div><p class="text-gray-800 dark:text-gray-200 font-medium italic text-left text-lg leading-relaxed">"My goal is to become a skilled software engineer and continuously improve my development skills."</p></div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-4">
-                            <button class="inline-flex w-full sm:w-auto justify-center items-center px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5" onclick="alert('CV Download started (Demo)')">
-                                <i data-lucide="download" class="w-5 h-5 mr-2"></i> Download CV
-                            </button>
-                            <a href="#projects" class="inline-flex w-full sm:w-auto justify-center items-center px-4 sm:px-6 py-3 bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-white text-sm sm:text-base font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
-                                <i data-lucide="code-2" class="w-5 h-5 mr-2"></i> View Projects
-                            </a>
-                        </div>
-                    </div>
-                    <div class="flex justify-center lg:justify-end relative opacity-0 scroll-animate delay-200 order-1 lg:order-2">
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-                        <div class="relative w-72 h-72 sm:w-96 sm:h-96 rounded-full p-2 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl">
-                            <div class="w-full h-full rounded-full overflow-hidden border-4 border-white dark:border-slate-800 relative z-10 bg-gray-100 dark:bg-slate-800">
-                                <img id="about-profile-image" src="/animationimages/noglasses pic.png" alt="Profile photo" class="w-full h-full object-cover transform hover:scale-110 transition-all duration-700 ease-in-out z-10 relative">
-                                <video id="about-profile-video-dark" class="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-150 ease-out pointer-events-none z-20" muted playsinline preload="auto" src="/animationimages/removeglassesvid.mp4"></video>
-                                <video id="about-profile-video-light" class="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-150 ease-out pointer-events-none z-20" muted playsinline preload="auto" src="/animationimages/puttingglassesvid.mp4"></video>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <hr class="my-8 md:my-10 border-line">
 
-                <!-- Skill Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="skills-container">
-                    <!-- Skills will be rendered here by JS -->
-                </div>
+        <!-- Experience Section -->
+        <section id="experience" class="scroll-animate">
+            <div class="flex items-baseline justify-between gap-4">
+                <h2 class="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] leading-tight">Experience.</h2>
+                <a href="experience.html" class="link shrink-0 text-soft">See more</a>
             </div>
+
+            <!-- Full timeline + CV download live on experience.html -->
+            <ol id="experience-list" class="mt-8">
+                <!-- Work experience rendered here by JS -->
+            </ol>
         </section>
+
+        <hr class="my-8 md:my-10 border-line">
 
         <!-- Projects Section -->
-        <section id="projects" class="py-24 bg-gray-50 dark:bg-slate-950">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Portfolio Showcase</h2>
-                    <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Explore my journey through projects, certifications, awards, and technical expertise.</p>
-                </div>
+        <section id="projects" class="scroll-animate">
+            <h2 class="max-w-3xl text-3xl sm:text-4xl font-semibold tracking-[-0.02em] leading-tight text-balance">Portfolio showcase.</h2>
 
-                <!-- Main Categories -->
-                <div class="flex flex-col sm:flex-row justify-center mb-12">
-                    <div class="bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm grid grid-cols-4 sm:flex sm:flex-row gap-2 sm:gap-0 w-full sm:w-auto">
-                        <button class="category-btn active relative flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-3 sm:py-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 w-full sm:w-48 text-white bg-blue-600" data-category="Projects">
-                            <i data-lucide="code" class="w-5 h-5"></i> Projects
-                        </button>
-                        <button class="category-btn relative flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-3 sm:py-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 w-full sm:w-48 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200" data-category="Certificates">
-                            <i data-lucide="award" class="w-5 h-5"></i> Certificates
-                        </button>
-                        <button class="category-btn relative flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-3 sm:py-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 w-full sm:w-48 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200" data-category="Awards">
-                            <i data-lucide="trophy" class="w-5 h-5"></i> Awards
-                        </button>
-                        <button class="category-btn relative flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-3 sm:py-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 w-full sm:w-48 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200" data-category="Tech Stack">
-                            <i data-lucide="layers" class="w-5 h-5"></i> Tech Stack
-                        </button>
-                    </div>
-                </div>
+            <!-- Main Categories -->
+            <div class="mt-8 flex gap-6 overflow-x-auto no-scrollbar border-b border-line">
+                <button class="category-btn is-active inline-flex shrink-0 items-center gap-2 border-b-2 border-transparent pb-3 text-sm font-medium text-muted transition-colors hover:text-foreground" data-category="Projects" aria-pressed="true">
+                    <i data-lucide="code" class="w-4 h-4 hidden sm:block"></i> Projects
+                </button>
+                <button class="category-btn inline-flex shrink-0 items-center gap-2 border-b-2 border-transparent pb-3 text-sm font-medium text-muted transition-colors hover:text-foreground" data-category="Certificates" aria-pressed="false">
+                    <i data-lucide="award" class="w-4 h-4 hidden sm:block"></i> Certificates
+                </button>
+                <button class="category-btn inline-flex shrink-0 items-center gap-2 border-b-2 border-transparent pb-3 text-sm font-medium text-muted transition-colors hover:text-foreground" data-category="Awards" aria-pressed="false">
+                    <i data-lucide="trophy" class="w-4 h-4 hidden sm:block"></i> Awards
+                </button>
+                <button class="category-btn inline-flex shrink-0 items-center gap-2 border-b-2 border-transparent pb-3 text-sm font-medium text-muted transition-colors hover:text-foreground" data-category="Tech Stack" aria-pressed="false">
+                    <i data-lucide="layers" class="w-4 h-4 hidden sm:block"></i> Tech Stack
+                </button>
+            </div>
 
-                <!-- Sub-Tabs for Projects -->
-                <div id="project-tabs" class="flex justify-center mb-12">
-                    <div class="p-1 bg-white dark:bg-slate-900 rounded-full border border-gray-200 dark:border-slate-800 inline-grid grid-cols-2 shadow-sm w-full max-w-sm">
-                        <button class="project-tab-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 text-white bg-red-500" data-tab="Project">Project</button>
-                        <button class="project-tab-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 text-gray-500 hover:text-gray-900 dark:hover:text-gray-300" data-tab="Design">Design</button>
-                    </div>
+            <!-- Sub-Tabs for Projects -->
+            <div id="project-tabs" class="mt-6 flex">
+                <div class="inline-flex gap-0.5 rounded-lg border border-line bg-card p-0.5">
+                    <button class="project-tab-btn is-active rounded-md px-3.5 py-1.5 text-sm font-medium text-muted transition-colors" data-tab="Project" aria-pressed="true">Project</button>
+                    <button class="project-tab-btn rounded-md px-3.5 py-1.5 text-sm font-medium text-muted transition-colors" data-tab="Design" aria-pressed="false">Design</button>
                 </div>
+            </div>
 
-                <!-- Dynamic Content Grid -->
+            <!-- Dynamic Content Grid -->
+            <div class="mt-8">
                 <div id="grid-container" class="min-h-[400px]">
                     <!-- Content injected via JS -->
                 </div>
             </div>
         </section>
 
-        <!-- Gallery Section -->
-        <section id="gallery" class="py-24 bg-white dark:bg-slate-900">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Gallery</h2>
-                    <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">A collection of photos from events and moments.</p>
-                </div>
-                <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Gallery content injected via JS -->
-                </div>
+        <hr class="my-8 md:my-10 border-line">
+
+        <!-- Tech Stack Section -->
+        <section id="tech-stack" class="scroll-animate">
+            <div class="flex items-baseline justify-between gap-4">
+                <h2 class="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] leading-tight">Tech stack.</h2>
+                <a href="tech-stack.html" class="link shrink-0 text-soft">See more</a>
+            </div>
+
+            <!-- Skill Stats -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 md:gap-x-10" id="skills-container">
+                <!-- Skills will be rendered here by JS -->
             </div>
         </section>
 
+        <hr class="my-8 md:my-10 border-line">
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="scroll-animate">
+            <h2 class="max-w-3xl text-3xl sm:text-4xl font-semibold tracking-[-0.02em] leading-tight text-balance">Gallery.</h2>
+            <p class="mt-3 max-w-[65ch] text-soft">A collection of photos from events and moments.</p>
+            <div id="gallery-grid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Gallery content injected via JS -->
+            </div>
+        </section>
+
+        <hr class="my-8 md:my-10 border-line">
+
         <!-- Contact Section -->
-        <section id="contact" class="py-24 bg-white dark:bg-slate-900 relative overflow-hidden">
-             <div class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-             <div class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <section id="contact" class="scroll-animate">
+            <h2 class="max-w-3xl text-3xl sm:text-4xl font-semibold tracking-[-0.02em] leading-tight text-balance">Get in touch.</h2>
+            <p class="mt-3 max-w-[65ch] text-soft">Feel free to reach out for collaboration, projects, or just to say hi!</p>
 
-             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="text-center mb-16 opacity-0 scroll-animate">
-                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">Get In Touch</h2>
-                    <p class="text-gray-600 dark:text-gray-400 max-w-xl mx-auto">Feel free to reach out for collaboration, projects, or just to say hi!</p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-                    <!-- Contact Info -->
-                    <div class="space-y-8 opacity-0 scroll-animate delay-200">
-                        <div class="bg-gray-50 dark:bg-slate-800 p-8 rounded-2xl border border-gray-100 dark:border-slate-700">
-                             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Contact Information</h3>
-                             <div class="space-y-6">
-                                <div class="flex items-start gap-4">
-                                    <div class="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg"><i data-lucide="mail" class="w-6 h-6"></i></div>
-                                    <div>
-                                        <h4 class="font-semibold text-gray-900 dark:text-white">Email</h4>
-                                        <a href="mailto:regalakhing@sac.edu.ph" class="text-gray-600 dark:text-gray-400 hover:text-blue-600">regalakhing@sac.edu.ph</a>
-                                    </div>
-                                </div>
-                                <div class="flex items-start gap-4">
-                                    <div class="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg"><i data-lucide="map-pin" class="w-6 h-6"></i></div>
-                                    <div>
-                                        <h4 class="font-semibold text-gray-900 dark:text-white">Location</h4>
-                                        <p class="text-gray-600 dark:text-gray-400">Mapatag Hamtic Antique</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start gap-4">
-                                    <div class="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg"><i data-lucide="phone" class="w-6 h-6"></i></div>
-                                    <div>
-                                        <h4 class="font-semibold text-gray-900 dark:text-white">Phone</h4>
-                                        <p class="text-gray-600 dark:text-gray-400">09382604239</p>
-                                    </div>
-                                </div>
-                             </div>
-                        </div>
+            <div class="mt-8 grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-12">
+                <!-- Contact Info -->
+                <dl class="self-start border-t border-line">
+                    <div class="flex items-center gap-4 border-b border-line py-4">
+                        <i data-lucide="mail" class="w-4 h-4 shrink-0 text-muted"></i>
+                        <dt class="w-20 shrink-0 text-sm text-muted">Email</dt>
+                        <dd class="min-w-0"><a href="mailto:regalakhing@sac.edu.ph" class="link break-all">regalakhing@sac.edu.ph</a></dd>
                     </div>
+                    <div class="flex items-center gap-4 border-b border-line py-4">
+                        <i data-lucide="map-pin" class="w-4 h-4 shrink-0 text-muted"></i>
+                        <dt class="w-20 shrink-0 text-sm text-muted">Location</dt>
+                        <dd class="min-w-0">Mapatag, Hamtic, Antique</dd>
+                    </div>
+                    <div class="flex items-center gap-4 border-b border-line py-4">
+                        <i data-lucide="phone" class="w-4 h-4 shrink-0 text-muted"></i>
+                        <dt class="w-20 shrink-0 text-sm text-muted">Phone</dt>
+                        <dd class="min-w-0"><a href="tel:09382604239" class="link tabular-nums">09382604239</a></dd>
+                    </div>
+                </dl>
 
-                   <div class="opacity-0 scroll-animate delay-300">
-            <form id="contact-form" class="space-y-6 bg-white dark:bg-slate-900 p-1">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Name</label>
-                    <input type="text" name="name" required class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white" placeholder="John Doe">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-                    <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white" placeholder="john@example.com">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
-                    <textarea name="message" rows="4" required class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white resize-none" placeholder="How can we help you?"></textarea>
-                </div>
-                <button type="submit" class="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2">
-                    Send Message <i data-lucide="send" class="w-5 h-5"></i>
-                </button>
-            </form>
-</div>
-                </div>
-             </div>
+                <form id="contact-form" class="space-y-5">
+                    <div>
+                        <label for="contact-name" class="block text-sm font-medium mb-1.5">Your Name</label>
+                        <input id="contact-name" type="text" name="name" required autocomplete="name" class="field" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="contact-email" class="block text-sm font-medium mb-1.5">Email Address</label>
+                        <input id="contact-email" type="email" name="email" required autocomplete="email" class="field" placeholder="john@example.com">
+                    </div>
+                    <div>
+                        <label for="contact-message" class="block text-sm font-medium mb-1.5">Message</label>
+                        <textarea id="contact-message" name="message" rows="4" required class="field resize-none" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-solid w-full">
+                        Send Message <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
         </section>
     </main>
+
     <!-- Footer -->
-    <footer class="relative overflow-hidden border-t border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950">
-        <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent"></div>
-        <div class="pointer-events-none absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-blue-500/10 blur-3xl"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="rounded-2xl border border-gray-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm p-6 sm:p-8">
-                <div class="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-                    <div class="text-center md:text-left">
-                        <a href="#home" class="inline-flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600/20 to-cyan-500/20 border border-blue-100 dark:border-blue-900/60">
-                                <img src="/images/xing (1).png" alt="Logo" class="h-6 w-6 object-contain">
-                            </div>
-                            <span class="text-lg font-bold text-gray-900 dark:text-white">Khing Jay</span>
-                        </a>
-                        <p class="mt-3 max-w-md mx-auto md:mx-0 text-sm text-gray-600 dark:text-gray-400">
-                            Building modern web experiences with clean design, smart logic, and real-world impact.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col gap-5 items-center md:items-end">
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
-                            <a href="#home" class="px-3 py-1.5 rounded-full text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors">Home</a>
-                            <a href="#about" class="px-3 py-1.5 rounded-full text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors">About</a>
-                            <a href="#projects" class="px-3 py-1.5 rounded-full text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors">Portfolio</a>
-                            <a href="#contact" class="px-3 py-1.5 rounded-full text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors">Contact</a>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <a href="https://github.com/Kaisecret" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="p-2.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:border-blue-400/50 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors">
-                                <svg viewBox="0 0 16 16" aria-hidden="true" class="w-4 h-4 fill-current">
-                                    <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.7 7.7 0 0 1 8 4.77a7.7 7.7 0 0 1 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
-                                </svg>
-                            </a>
-                            <a href="mailto:regalakhing@sac.edu.ph" aria-label="Email" class="p-2.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:border-blue-400/50 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors">
-                                <i data-lucide="mail" class="w-4 h-4"></i>
-                            </a>
-                            <a href="#home" aria-label="Back to top" class="p-2.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:border-blue-400/50 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors">
-                                <i data-lucide="arrow-up" class="w-4 h-4"></i>
-                            </a>
-                        </div>
-                    </div>
+    <footer class="mt-8 md:mt-10 border-t border-line">
+        <div class="max-w-5xl mx-auto px-5 sm:px-8 py-8">
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <a href="#home" class="inline-flex items-center gap-2.5 font-semibold tracking-tight">
+                        <img src="/images/xing (1).png" alt="" class="w-6 h-6 object-contain">
+                        <span>Khing Jay</span>
+                    </a>
+                    <p class="mt-2 max-w-md text-sm text-soft">
+                        Building modern web experiences with clean design, smart logic, and real-world impact.
+                    </p>
                 </div>
-                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center sm:items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400 text-center sm:text-left">
-                    <p>&copy; 2026 Khing Jay Regala. All rights reserved.</p>
-                    <p>Built with Vanilla HTML, JS & Tailwind CSS</p>
+
+                <div class="-ml-3 flex items-center gap-1 sm:ml-0 sm:-mr-3">
+                    <a href="https://github.com/Kaisecret" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="icon-btn">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" class="w-4 h-4 fill-current">
+                            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.7 7.7 0 0 1 8 4.77a7.7 7.7 0 0 1 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+                        </svg>
+                    </a>
+                    <a href="mailto:regalakhing@sac.edu.ph" aria-label="Email" class="icon-btn">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                    </a>
+                    <a href="#home" aria-label="Back to top" class="icon-btn">
+                        <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -444,31 +341,29 @@
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="fixed inset-0 z-[150] hidden items-center justify-center bg-black/90 backdrop-blur-sm p-4 sm:p-8">
-        <button id="lightbox-close" class="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors z-[160]">
-            <i data-lucide="x" class="w-8 h-8"></i>
+        <button id="lightbox-close" class="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 hover:text-white bg-white/10 hover:bg-white/20 transition-colors z-[160]" aria-label="Close">
+            <i data-lucide="x" class="w-5 h-5"></i>
         </button>
-        <img id="lightbox-img" src="" alt="Full View" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+        <img id="lightbox-img" alt="Full View" class="max-w-full max-h-[90vh] object-contain rounded-lg">
     </div>
 
     <!-- Demo Warning Modal (ADDED) -->
     <div id="demo-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div class="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl overflow-hidden">
-        <div class="p-5 border-b border-gray-200 dark:border-slate-700">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">Demo Only</h3>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-            This app is for demo purposes only - it is <strong>not</strong> the actual application.
+      <div class="w-full max-w-md rounded-xl bg-card border border-line shadow-2xl overflow-hidden">
+        <div class="p-5 border-b border-line">
+          <h3 class="text-lg font-semibold tracking-tight">Demo Only</h3>
+          <p class="mt-2 text-sm text-soft leading-relaxed">
+            This app is for demo purposes only - it is <strong class="text-foreground">not</strong> the actual application.
             Do you want to proceed?
           </p>
         </div>
 
         <div class="p-5 flex flex-col sm:flex-row gap-3 sm:justify-end">
-          <button id="demo-cancel-btn"
-            class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+          <button id="demo-cancel-btn" class="btn btn-outline w-full sm:w-auto">
             Cancel
           </button>
 
-          <button id="demo-proceed-btn"
-            class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+          <button id="demo-proceed-btn" class="btn btn-solid w-full sm:w-auto">
             Proceed
           </button>
         </div>
@@ -476,36 +371,36 @@
     </div>
 
     <!-- ChatBot Widget -->
-    <button id="chatbot-toggle" class="fixed right-5 bottom-5 z-[100] p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all duration-300 flex items-center justify-center group">
-        <i data-lucide="message-circle" class="w-6 h-6" id="chat-icon"></i>
-        <i data-lucide="x" class="w-6 h-6 hidden" id="chat-close-icon"></i>
-        <span id="chatbot-hook" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-100 text-xs font-semibold shadow-md border border-gray-200 dark:border-slate-700 animate-pulse whitespace-nowrap pointer-events-none">Ask AI</span>
+    <button id="chatbot-toggle" class="fixed right-5 bottom-5 z-[100] h-12 w-12 bg-foreground text-background rounded-full shadow-lg transition-transform duration-300 hover:scale-105 flex items-center justify-center group" aria-label="Open portfolio assistant">
+        <i data-lucide="message-circle" class="w-5 h-5" id="chat-icon"></i>
+        <i data-lucide="x" class="w-5 h-5 hidden" id="chat-close-icon"></i>
+        <span id="chatbot-hook" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card text-foreground text-xs font-medium shadow-sm border border-line whitespace-nowrap pointer-events-none"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span>Ask AI</span>
     </button>
 
-    <div id="chat-window" class="fixed z-[100] w-[90vw] sm:w-96 h-[500px] max-h-[70vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700 flex flex-col overflow-hidden bottom-24 right-5 origin-bottom-right hidden">
-        <div class="p-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white flex items-center justify-between gap-3 shrink-0">
+    <div id="chat-window" class="fixed z-[100] w-[90vw] sm:w-96 h-[500px] max-h-[70vh] bg-card rounded-xl shadow-2xl border border-line flex flex-col overflow-hidden bottom-24 right-5 origin-bottom-right hidden">
+        <div class="p-4 bg-surface border-b border-line flex items-center justify-between gap-3 shrink-0">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-white/20 rounded-lg"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+                <div class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-card"><i data-lucide="sparkles" class="w-4 h-4"></i></div>
                 <div>
-                    <h3 class="font-bold text-sm">Portfolio Assistant</h3>
-                    <p class="text-xs text-blue-100">Ask about Khing Jay's Skills</p>
+                    <h3 class="font-semibold text-sm tracking-tight">Portfolio Assistant</h3>
+                    <p class="text-xs text-muted">Ask about Khing Jay's Skills</p>
                 </div>
             </div>
-            <button id="close-chat-btn" class="p-1 hover:bg-white/20 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button id="close-chat-btn" class="icon-btn" aria-label="Close chat"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-slate-950/50">
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
             <!-- Messages go here -->
             <div class="flex justify-start">
-                <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 rounded-bl-none shadow-sm">
+                <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-surface text-soft border border-line rounded-bl-none">
                     Hi! I'm Khing Jay's AI assistant. Ask about projects, skills, or message Khing directly.
                 </div>
             </div>
         </div>
-        <div class="p-4 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 shrink-0">
+        <div class="p-4 bg-card border-t border-line shrink-0">
             <div class="flex gap-2">
-                <input type="text" id="chat-input" placeholder="Ask about skills..." class="flex-1 px-4 py-2 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm">
-                <button id="chat-send" class="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
-                    <i data-lucide="send" class="w-5 h-5"></i>
+                <input type="text" id="chat-input" placeholder="Ask about skills..." aria-label="Message" class="field flex-1 !text-sm">
+                <button id="chat-send" class="btn btn-solid w-10 px-0 shrink-0" aria-label="Send">
+                    <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
@@ -515,5 +410,3 @@
     <script type="module" src="/js/main.js"></script>
 </body>
 </html>
-
-
