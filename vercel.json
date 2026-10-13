@@ -6,9 +6,9 @@
   },
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "khingjay.vercel.app" }],
-      "destination": "https://www.khingjay.tech/:path*",
+      "destination": "https://www.khingjay.tech/$1",
       "permanent": true
     }
   ],
