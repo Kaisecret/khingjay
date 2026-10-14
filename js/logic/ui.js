@@ -1,5 +1,6 @@
 import { SKILLS, EXPERIENCE, PROJECT_EXPERIENCE, EDUCATION, ACHIEVEMENTS, PROJECTS, TECH_ICONS, CASE_STUDIES, designProjects, certificates, awards, gallery, techStack } from './data.js';
 import { createProfileThemeSwapController } from './profileThemeSwap.mjs';
+import { openLightbox, setupLightbox } from './lightbox.mjs';
 
 const INITIAL_PROJECT_LIMIT = 6;
 const INITIAL_EXPERIENCE_LIMIT = 1;
@@ -57,6 +58,7 @@ export function initCaseStudyPage() {
   lucide.createIcons();
   renderCaseStudyPage();
   setupNavbarAndTheme();
+  setupLightbox();
 }
 
 function runThemeTransition(toggle, applyTheme) {
@@ -290,6 +292,25 @@ function renderHighlights(highlights = []) {
   }).join('');
 }
 
+function getCaseStudyReadTime(study) {
+  const text = [
+    study.headline,
+    study.intro,
+    ...study.why,
+    study.role.summary,
+    ...study.role.duties,
+    study.team?.summary || '',
+    ...study.features.flatMap((feature) => [feature.title, feature.text]),
+    ...study.stack.flatMap((group) => [group.group, ...group.items]),
+    study.pipelineTitle,
+    ...study.pipeline,
+    ...study.lessons.flatMap((lesson) => [lesson.title, lesson.text]),
+    study.screensIntro
+  ].join(' ').replace(/<[^>]*>/g, ' ');
+  const wordCount = text.trim().split(/\s+/).length;
+  return `${Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE))} min read`;
+}
+
 function renderProjectPage() {
   const container = document.getElementById('project-detail');
   const slug = new URLSearchParams(window.location.search).get('p');
@@ -304,6 +325,10 @@ function renderProjectPage() {
   }
 
   document.title = `${project.title} | Khing Jay Regala`;
+  const study = CASE_STUDIES[slug];
+  const studyYear = study
+    ? [project.period, ...study.facts.map((fact) => fact.value)].join(' ').match(/\b(?:19|20)\d{2}\b/)?.[0]
+    : null;
 
   const links = [
     project.demoUrl !== '#' ? `<a href="#" data-demo-url="${project.demoUrl}" class="demo-link link !inline-flex items-center gap-1.5"><i data-lucide="external-link" class="w-[18px] h-[18px]"></i> demo</a>` : '',
@@ -327,16 +352,23 @@ function renderProjectPage() {
     <a href="${project.imageUrl}" target="_blank" rel="noopener noreferrer" class="mt-8 block w-fit max-w-full overflow-hidden rounded-xl border border-line bg-surface cursor-zoom-in" aria-label="Open full image of ${project.title}">
       <img src="${project.imageUrl}" alt="Screenshot of ${project.title}" class="block w-auto h-auto max-w-full max-h-[22rem] sm:max-h-[26rem]">
     </a>
-    ${CASE_STUDIES[slug] ? `
-      <div class="mt-10 flex flex-col items-start gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p class="text-lg font-semibold tracking-tight">Read the case study</p>
-          <p class="mt-1 text-soft text-pretty">My role, the features, the tech stack, every screen, and what I learned.</p>
-        </div>
-        <a href="${CASE_STUDY_PAGE_URL}?p=${slug}" class="btn btn-solid shrink-0">
-          View case study <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    ${study ? `
+      <section class="project-case-studies" aria-labelledby="project-case-studies-title">
+        <h2 id="project-case-studies-title">Case Studies</h2>
+        <a href="${CASE_STUDY_PAGE_URL}?p=${slug}" class="case-study-preview" aria-labelledby="case-study-preview-title">
+          <div class="case-study-preview-media">
+            <img src="${project.imageUrl}" alt="" loading="lazy" decoding="async">
+          </div>
+          <div class="case-study-preview-copy">
+            <h3 id="case-study-preview-title">${study.headline}</h3>
+            <p class="case-study-preview-summary">${study.intro}</p>
+            <div class="case-study-preview-footer">
+              <p class="case-study-preview-meta">${[studyYear, getCaseStudyReadTime(study)].filter(Boolean).join(' <span aria-hidden="true">&bull;</span> ')}</p>
+              <span class="project-card-view card-hint" aria-hidden="true">View <i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
+            </div>
+          </div>
         </a>
-      </div>
+      </section>
     ` : ''}
   `;
 
@@ -431,14 +463,18 @@ function renderCaseStudyPage() {
     study.team ? renderCaseStudySection('team', `
       ${paragraph(study.team.summary)}
       <figure class="mt-8">
-        <img src="${study.team.photo}" alt="${study.team.photoAlt}" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-xl border border-line object-cover ${study.team.photoFocus || 'object-[50%_68%]'} sm:aspect-[16/10]">
+        <button type="button" class="photo-trigger" data-photo-gallery="team" aria-haspopup="dialog">
+          <img src="${study.team.photo}" alt="${study.team.photoAlt}" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-xl border border-line object-cover ${study.team.photoFocus || 'object-[50%_68%]'} sm:aspect-[16/10]">
+        </button>
         <figcaption class="mt-3 text-sm text-muted">${study.team.caption}</figcaption>
       </figure>
       ${study.team.eventPhotos ? `
         <div class="mt-4 grid gap-4 ${study.team.eventPhotos.length >= 3 ? 'sm:grid-cols-3' : 'grid-cols-2'}">
           ${study.team.eventPhotos.map((photo) => `
             <figure>
-              <img src="${photo.image}" alt="${photo.alt}" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-lg border border-line object-cover ${photo.focus || ''}">
+              <button type="button" class="photo-trigger" data-photo-gallery="team" aria-haspopup="dialog">
+                <img src="${photo.image}" alt="${photo.alt}" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-lg border border-line object-cover ${photo.focus || ''}">
+              </button>
               ${photo.caption ? `<figcaption class="mt-2 text-sm text-muted">${photo.caption}</figcaption>` : ''}
             </figure>
           `).join('')}
@@ -537,6 +573,11 @@ function renderCaseStudyPage() {
               <button type="button" class="fan-dot" data-fan-dot="${index}" aria-label="Show ${screen.title}"><span></span></button>
             `).join('')}
           </div>
+          <div class="mt-3 flex justify-center">
+            <button type="button" class="btn btn-outline" data-fan-expand aria-haspopup="dialog">
+              <i data-lucide="maximize-2" class="w-4 h-4"></i> View full size
+            </button>
+          </div>
         </div>
       `).join('')}
     `)
@@ -589,8 +630,7 @@ function renderCaseStudyPage() {
     </div>
   `;
 
-  const wordCount = container.textContent.trim().split(/\s+/).length;
-  container.querySelector('[data-read-time]').textContent = `${Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE))} min read`;
+  container.querySelector('[data-read-time]').textContent = getCaseStudyReadTime(study);
 
   setupCaseStudyTabs(container);
   container.querySelectorAll('.screen-fan').forEach((fan, index) => setupScreenFan(fan, screenSets[index].screens));
@@ -701,6 +741,13 @@ function setupScreenFan(fan, screens) {
 
   fan.querySelector('[data-fan-prev]').addEventListener('click', () => show(active - 1));
   fan.querySelector('[data-fan-next]').addEventListener('click', () => show(active + 1));
+  fan.querySelector('[data-fan-expand]').addEventListener('click', (event) => {
+    openLightbox(screens.map((screen) => ({
+      src: screen.image,
+      alt: screen.title,
+      caption: `${screen.title} — ${screen.caption}`
+    })), active, event.currentTarget);
+  });
 
   show(Number(fan.dataset.initial) || 0);
 }
@@ -829,6 +876,7 @@ function renderGrid(category, subTab = null) {
             ${p.demoUrl !== '#' ? `<a href="#" data-demo-url="${p.demoUrl}" class="demo-link relative z-10 -m-1.5 p-1.5 transition-colors hover:text-foreground" aria-label="Live demo of ${p.title}"><i data-lucide="external-link" class="w-[18px] h-[18px]"></i></a>` : ''}
             ${p.codeUrl !== '#' ? `<a href="${p.codeUrl}" target="_blank" rel="noopener noreferrer" class="relative z-10 -m-1.5 p-1.5 transition-colors hover:text-foreground" aria-label="Source code of ${p.title}">${GITHUB_ICON}</a>` : ''}
             ${p.technologies.map((name) => renderTechIcon(name)).join('')}
+            <span class="project-card-view card-hint" aria-hidden="true">View <i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
           </div>
         </article>
       `).join('');
@@ -849,10 +897,10 @@ function renderGrid(category, subTab = null) {
       className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
       content = designProjects.map((p) => `
         <div class="card">
-          <div class="relative aspect-[4/4] overflow-hidden border-b border-line bg-surface cursor-zoom-in p-3" onclick="openLightbox('${p.image}')">
+          <button type="button" class="photo-trigger relative aspect-[4/4] overflow-hidden border-b border-line bg-surface p-3" data-photo-gallery="designs" aria-haspopup="dialog">
             <img src="${p.image}" alt="${p.title}" loading="lazy" class="card-thumb w-full h-full object-contain rounded-md">
             <span class="card-hint tag absolute bottom-3 right-3 gap-1.5 bg-card text-foreground"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View</span>
-          </div>
+          </button>
           <div class="flex flex-1 flex-col p-4">
             <h3 class="font-semibold tracking-tight leading-snug text-balance">${p.title}</h3>
             <p class="mt-1.5 text-sm text-soft line-clamp-3">${p.description}</p>
@@ -880,11 +928,11 @@ function renderGrid(category, subTab = null) {
 
     content = data.map((c) => `
       <div class="card w-full">
-        <div class="relative ${isAwards ? 'aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden border-b border-line bg-surface cursor-zoom-in" onclick="openLightbox('${c.image}')">
+        <button type="button" class="photo-trigger relative ${isAwards ? 'aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden border-b border-line bg-surface" data-photo-gallery="${isAwards ? 'awards' : 'certificates'}" aria-haspopup="dialog">
           <img src="${c.image}" alt="${c.title}" loading="lazy" class="card-thumb w-full h-full ${isAwards || isCertificates ? 'object-contain p-4' : 'object-cover'}">
           ${c.featured ? '<span class="tag absolute top-3 left-3 gap-1.5 bg-card text-foreground"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span>Featured</span>' : ''}
           <span class="card-hint tag absolute bottom-3 right-3 bg-card text-foreground">${openLabel}</span>
-        </div>
+        </button>
         <div class="p-4">
           <div class="flex justify-between items-center mb-2 font-mono text-xs text-muted">
             <span>${c.issuer}</span>
@@ -932,10 +980,10 @@ function renderGallerySection() {
 
   galleryContainer.innerHTML = gallery.map((item) => `
     <div class="card">
-      <div class="relative aspect-[4/3] overflow-hidden border-b border-line bg-surface cursor-zoom-in" onclick="openLightbox('${item.image}')">
+      <button type="button" class="photo-trigger relative aspect-[4/3] overflow-hidden border-b border-line bg-surface" data-photo-gallery="gallery" aria-haspopup="dialog">
         <img src="${item.image}" alt="${item.title}" loading="lazy" class="card-thumb w-full h-full object-cover">
         <span class="card-hint tag absolute bottom-3 right-3 bg-card text-foreground">${item.label}</span>
-      </div>
+      </button>
       <div class="p-4">
         <h3 class="font-semibold tracking-tight leading-snug">${item.title}</h3>
         ${item.detail ? `<p class="mt-1 text-sm text-soft">${item.detail}</p>` : ''}
@@ -944,29 +992,6 @@ function renderGallerySection() {
   `).join('');
 
   lucide.createIcons();
-}
-
-function setupLightbox() {
-  window.openLightbox = (src) => {
-    const lb = document.getElementById('lightbox');
-    const img = document.getElementById('lightbox-img');
-    img.src = src;
-    lb.classList.remove('hidden');
-    lb.classList.add('flex');
-  };
-
-  document.getElementById('lightbox-close').addEventListener('click', () => {
-    const lb = document.getElementById('lightbox');
-    lb.classList.add('hidden');
-    lb.classList.remove('flex');
-  });
-
-  document.getElementById('lightbox').addEventListener('click', (e) => {
-    if (e.target !== e.currentTarget) return;
-    const lb = document.getElementById('lightbox');
-    lb.classList.add('hidden');
-    lb.classList.remove('flex');
-  });
 }
 
 function setupDemoModal() {
