@@ -495,12 +495,49 @@ input, textarea {
 
 @media (max-width: 639px) {
     .case-study-preview {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 1rem;
+        grid-template-columns: clamp(5rem, 30%, 7.5rem) minmax(0, 1fr);
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
     }
 
     .case-study-preview-media {
-        aspect-ratio: 16 / 9;
+        aspect-ratio: 4 / 3;
+    }
+
+    .case-study-preview-copy h3 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .case-study-preview-summary {
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .case-study-preview-footer {
+        gap: 0.5rem;
+        margin-top: 0.375rem;
+    }
+
+    .case-study-preview-meta {
+        font-size: 0.6875rem;
+        white-space: nowrap;
+    }
+
+    .case-study-preview .project-card-view {
+        flex-shrink: 0;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .case-study-preview .project-card-view svg {
+        width: 0.875rem;
+        height: 0.875rem;
     }
 }
 
