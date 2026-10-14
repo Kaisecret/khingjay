@@ -904,6 +904,34 @@ export const gallery = [
     title: 'Profile Photo',
     label: 'Gallery',
     image: galleryPath('me.webp')
+  },
+  {
+    id: 4,
+    title: 'Team 3AM Engineers',
+    label: 'Champion',
+    detail: 'Our certificates outside Kapinangan Hall at the Cyberian 2.0 Hackathon.',
+    image: wattsnapPhoto('team-certificates')
+  },
+  {
+    id: 5,
+    title: 'WattSnap AI Pitch',
+    label: 'Cyberian 2.0',
+    detail: 'Facing the judges after our WattSnap AI pitch.',
+    image: wattsnapPhoto('pitch')
+  },
+  {
+    id: 6,
+    title: 'With Judge Bryl Lim',
+    label: 'Cyberian 2.0',
+    detail: 'Khing Jay Regala with judge Bryl Lim after the pitch.',
+    image: wattsnapPhoto('with-judge')
+  },
+  {
+    id: 7,
+    title: 'Cyberian 2.0 Champions',
+    label: 'WattSnap AI',
+    detail: 'Champion, Industry-Ready Team, and Best Pitch.',
+    image: wattsnapPhoto('team-celebrate')
   }
 ];
 
