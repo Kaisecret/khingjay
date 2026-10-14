@@ -17,7 +17,7 @@ Email: regalakhing@sac.edu.ph
 Phone: 09382604239
 Location: Mapatag Hamtic Antique
 
-Projects: PhysiqueCheck, SMARTCHOICE, String Builder Portflio, PassGenAI, StudentWellnessGuard, ILOVE YOU VENUS`;
+Projects: WattSnap AI (Champion, Industry-Ready Team, and Best Pitch at the Cyberian 2.0 Hackathon), Meedocentrix, ARPS, Aria's Pharmora, AgriPalAI, PhysiqueCheck, SMARTCHOICE, ORR Beach Resort`;
 
 async function fetchBackendReply(message) {
   const endpoints = ['/api/chatbot', '/api/chatbot.php'];
@@ -54,7 +54,7 @@ function getFriendlyFallback(message) {
   if (/location|address|where/.test(text)) return 'Location: Mapatag Hamtic Antique';
 
   if (/project|projects|portfolio/.test(text)) {
-    return 'Projects: PhysiqueCheck, SMARTCHOICE, String Builder Portflio, PassGenAI, StudentWellnessGuard, ILOVE YOU VENUS';
+    return "Projects: WattSnap AI (Champion, Industry-Ready Team, and Best Pitch at the Cyberian 2.0 Hackathon), Meedocentrix, ARPS, Aria's Pharmora, AgriPalAI, PhysiqueCheck, SMARTCHOICE, ORR Beach Resort";
   }
 
   if (/skill|skills|tech/.test(text)) {

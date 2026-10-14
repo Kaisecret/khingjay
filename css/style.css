@@ -281,6 +281,61 @@ input, textarea {
     filter: brightness(0) invert(1);
 }
 
+/* Highlight chips: events, judges, and awards on project cards and pages */
+.hl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.625rem;
+    border: 1px solid rgb(var(--border));
+    border-radius: 9999px;
+    background-color: rgb(var(--surface));
+    color: rgb(var(--foreground-soft));
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    white-space: nowrap;
+}
+
+.hl-chip svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+.hl-champion {
+    border-color: transparent;
+    background: linear-gradient(90deg, #fde047, #f59e0b);
+    color: #451a03;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgb(245 158 11 / 0.35);
+}
+
+.hl-award {
+    border-color: rgb(245 158 11 / 0.4);
+    background-color: rgb(245 158 11 / 0.1);
+    color: #b45309;
+    font-weight: 600;
+}
+
+.dark .hl-award {
+    color: #fcd34d;
+}
+
+.hl-judge-chip {
+    border-color: rgb(14 165 233 / 0.35);
+    background-color: rgb(14 165 233 / 0.08);
+}
+
+/* WattSnap brand blue */
+.hl-judge {
+    color: #0b84d8;
+    font-weight: 600;
+}
+
+.dark .hl-judge {
+    color: #38bdf8;
+}
+
 /* Cards */
 .card {
     position: relative;
@@ -376,6 +431,260 @@ input, textarea {
     box-shadow: 0 0 0 3px rgb(var(--accent) / 0.25);
 }
 
+/* Case study screens: device frames fanned out like a hand of cards, the active one in front */
+.screen-fan-stage {
+    --frame-width: 11.25rem;
+    --fan-spread: 54%;
+    --fan-tilt: 7deg;
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: calc(var(--frame-width) / var(--screen-ratio, 0.4615) + 5.5rem);
+    overflow: hidden;
+    border: 1px solid rgb(var(--border));
+    border-radius: 1rem;
+    background:
+        radial-gradient(55% 50% at 50% 45%, rgb(var(--accent) / 0.18), transparent 72%),
+        radial-gradient(rgb(var(--foreground) / 0.08) 1px, transparent 1px) 0 0 / 18px 18px,
+        rgb(var(--surface));
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+@media (min-width: 640px) {
+    .screen-fan-stage {
+        --frame-width: 14rem;
+        --fan-spread: 62%;
+    }
+}
+
+.fan-item {
+    grid-area: 1 / 1;
+    transform:
+        translateX(calc(var(--offset, 0) * var(--fan-spread)))
+        translateY(calc(var(--distance, 0) * 1.25rem))
+        rotate(calc(var(--offset, 0) * var(--fan-tilt)))
+        scale(calc(1 - var(--distance, 0) * 0.12));
+    transform-origin: 50% 100%;
+    transition: transform 0.6s var(--ease-out), opacity 0.4s ease, filter 0.4s ease;
+    cursor: pointer;
+}
+
+.fan-item[data-depth="active"] {
+    cursor: default;
+}
+
+.fan-item[data-depth="near"],
+.fan-item[data-depth="mid"] {
+    filter: brightness(calc(1 - var(--distance, 0) * 0.1)) saturate(0.85);
+}
+
+.fan-item[data-depth="far"] {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 639px) {
+    .fan-item[data-depth="mid"] {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+/* Phone frame: dark bezel, side buttons, Dynamic Island */
+.iphone {
+    position: relative;
+    width: var(--frame-width);
+    padding: calc(var(--frame-width) * 0.034);
+    border-radius: calc(var(--frame-width) * 0.17);
+    background: #0d0d0f;
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 0.16),
+        inset 0 0 0 3px #1d1d20,
+        0 28px 50px -18px rgb(0 0 0 / 0.5),
+        0 10px 18px -10px rgb(0 0 0 / 0.35);
+}
+
+.iphone::before,
+.iphone::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    background: #1d1d20;
+}
+
+.iphone::before {
+    left: -2px;
+    top: 21%;
+    height: 7%;
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 calc(var(--frame-width) * 0.2) 0 #1d1d20;
+}
+
+.iphone::after {
+    right: -2px;
+    top: 27%;
+    height: 12%;
+    border-radius: 0 2px 2px 0;
+}
+
+.iphone-screen {
+    overflow: hidden;
+    aspect-ratio: var(--screen-ratio, 0.4615);
+    border-radius: calc(var(--frame-width) * 0.136);
+    background: #000;
+}
+
+.iphone-screen img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    pointer-events: none;
+}
+
+.iphone-island {
+    position: absolute;
+    top: calc(var(--frame-width) * 0.046);
+    left: 50%;
+    width: 25%;
+    height: calc(var(--frame-width) * 0.06);
+    border-radius: 9999px;
+    background: #000;
+    transform: translateX(-50%);
+}
+
+/* Laptop frame for desktop screens: dark lid with camera, silver base with a finger notch */
+.screen-fan--laptop {
+    --screen-ratio: 2;
+}
+
+.screen-fan--laptop .screen-fan-stage {
+    --frame-width: 17rem;
+    --fan-spread: 44%;
+    --fan-tilt: 4deg;
+    height: calc(var(--frame-width) / var(--screen-ratio) + 5rem);
+}
+
+@media (min-width: 640px) {
+    .screen-fan--laptop .screen-fan-stage {
+        --frame-width: 29rem;
+        --fan-spread: 50%;
+        height: calc(var(--frame-width) / var(--screen-ratio) + 7.5rem);
+    }
+}
+
+.laptop {
+    width: var(--frame-width);
+    filter: drop-shadow(0 22px 26px rgb(0 0 0 / 0.28));
+}
+
+.laptop-lid {
+    position: relative;
+    padding: calc(var(--frame-width) * 0.026) calc(var(--frame-width) * 0.022) calc(var(--frame-width) * 0.03);
+    border-radius: calc(var(--frame-width) * 0.032) calc(var(--frame-width) * 0.032) calc(var(--frame-width) * 0.008) calc(var(--frame-width) * 0.008);
+    background: #0d0d0f;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16), inset 0 0 0 3px #1d1d20;
+}
+
+.laptop-lid::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--frame-width) * 0.009);
+    left: 50%;
+    width: calc(var(--frame-width) * 0.009);
+    height: calc(var(--frame-width) * 0.009);
+    border-radius: 9999px;
+    background: #2a2a30;
+    transform: translateX(-50%);
+}
+
+.laptop-screen {
+    overflow: hidden;
+    aspect-ratio: var(--screen-ratio);
+    border-radius: 2px;
+    background: #fff;
+}
+
+.laptop-screen img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+    pointer-events: none;
+}
+
+.laptop-base {
+    position: relative;
+    width: 116%;
+    height: calc(var(--frame-width) * 0.032);
+    margin-left: -8%;
+    border-radius: 2px 2px calc(var(--frame-width) * 0.05) calc(var(--frame-width) * 0.05) / 2px 2px calc(var(--frame-width) * 0.022) calc(var(--frame-width) * 0.022);
+    background: linear-gradient(180deg, #e4e4e7 0%, #c4c4c9 55%, #9b9ba3 100%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+}
+
+.laptop-base::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 15%;
+    height: 42%;
+    border-radius: 0 0 calc(var(--frame-width) * 0.012) calc(var(--frame-width) * 0.012);
+    background: linear-gradient(180deg, #a1a1aa, #c4c4c9);
+    transform: translateX(-50%);
+}
+
+/* Case study section tabs: underline marks the section being read */
+.case-tabs {
+    box-shadow: inset 0 -1px 0 rgb(var(--border));
+}
+
+.case-tab {
+    display: block;
+    padding: 0.875rem 0 0.8125rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: rgb(var(--foreground-muted));
+    white-space: nowrap;
+    transition: color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.case-tab:hover {
+    color: rgb(var(--foreground));
+}
+
+.case-tab.is-active {
+    color: rgb(var(--foreground));
+    box-shadow: inset 0 -2px 0 rgb(var(--foreground));
+}
+
+.fan-dot {
+    display: inline-flex;
+    padding: 0.5rem 0.25rem;
+}
+
+.fan-dot span {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: rgb(var(--foreground-muted) / 0.4);
+    transition: width 0.3s var(--ease-out), background-color 0.2s ease-out;
+}
+
+.fan-dot:hover span {
+    background: rgb(var(--foreground-muted));
+}
+
+.fan-dot[aria-current="true"] span {
+    width: 1.25rem;
+    background: rgb(var(--foreground));
+}
+
 /* Animation Utilities */
 .hero-in {
     animation: fadeIn 0.7s var(--ease-out) both;
@@ -453,6 +762,11 @@ input, textarea {
     .card:hover,
     .card:hover .card-thumb {
         transform: none;
+    }
+
+    .fan-item,
+    .fan-dot span {
+        transition: none;
     }
 }
 

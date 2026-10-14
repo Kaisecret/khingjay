@@ -50,29 +50,19 @@ Tech: Php, MySQL, Python, Tailwind, Pycharm, Vscode, Xampp
 Demo: Not available
 Source: Not available
 
-3) String Builder Portflio
-Description: A desktop portfolio and resume generator for students applying for jobs and internships.
-Tech: Neatbens, MySQL, java, Xampp
-Demo: Not available
+3) ORR Beach Resort
+Description: A responsive website for ORR Beach Resort in Banawon, Hamtic, Antique showing its rooms, amenities, dining, gallery, booking inquiries, and map location.
+Tech: HTML, CSS, Tailwind CSS, JavaScript, Vercel
+Demo: https://orr-beach-resort-website.vercel.app/
 Source: Not available
 
-4) PassGenAI
-Description: An AI-powered password generator that creates secure and memorable passwords.
-Tech: React, Tailwind, Supabase
-Demo: https://passgen-ai-murex.vercel.app/
-Source: https://github.com/Kaisecret/PassgenAi
-
-5) StudentWellnessGuard
-Description: An AI-powered tool that analyzes facial cues to detect early signs of fatigue and stress.
-Tech: Php, MySQL, Python, Tailwind, Pycharm, Vscode, Xampp
-Demo: Not available
+4) WattSnap AI
+Description: A home electricity assistant for households in Antique. It reads electricity bills, estimates appliance energy use, gives Tipid Tips, tracks a Smart Energy Budget, and matches ANTECO brownout advisories to the household barangay, with saved information available offline.
+Awards: Champion, Industry-Ready Team, and Best Pitch at the Cyberian 2.0 Hackathon (October 13, 2026), judged by a panel that included Bryl Lim.
+Team: Team 3AM Engineers. Khing Jay Regala was the lead developer.
+Tech: Next.js, React, TypeScript, Supabase, Vercel
+Demo: https://www.wattsnapai.dev/
 Source: Not available
-
-6) ILOVE YOU VENUS
-Description: A simple anniversary website with games, pictures, a heartfelt letter, and a virtual garden.
-Tech: JavaScript, HTML5, Tailwind
-Demo: https://kaisecret.github.io/happy_anniversary/home.html
-Source: https://github.com/Kaisecret/happy_anniversary
 TXT;
 
 $systemPrompt = "You are an AI assistant on Khing Jay Regala's portfolio website. You can answer general questions and portfolio questions. Use the portfolio data below when relevant.\n\nImportant behavior rules:\n1) If user asks for Khing's location, provide: Mapatag Hamtic Antique.\n2) If user asks for YOUR location / AI location, say you do not have a physical location.\n3) Do not confuse AI location with Khing's location.\n4) Be concise and clear.\n\nPortfolio Data:\n" . $portfolioData;

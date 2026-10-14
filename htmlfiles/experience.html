@@ -17,11 +17,13 @@
     <link rel="icon" type="image/png" href="/images/xing%20(1).png">
     <link rel="apple-touch-icon" href="/images/xing%20(1).png">
 
-    <!-- Light is the default theme; restore a saved dark choice before first paint -->
+    <!-- Dark is the default theme; restore a saved light choice before first paint -->
     <script>
+      var savedTheme = null;
       try {
-        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+        savedTheme = localStorage.getItem('theme');
       } catch (error) {}
+      if (savedTheme !== 'light') document.documentElement.classList.add('dark');
     </script>
 
     <!-- Fonts are hosted with the site (@font-face rules are in css/style.css) -->

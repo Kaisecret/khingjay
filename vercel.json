@@ -31,6 +31,7 @@
     { "source": "/experience", "destination": "/htmlfiles/experience.html" },
     { "source": "/experience.html", "destination": "/htmlfiles/experience.html" },
     { "source": "/project.html", "destination": "/htmlfiles/project.html" },
+    { "source": "/case-study.html", "destination": "/htmlfiles/case-study.html" },
     { "source": "/tech-stack", "destination": "/htmlfiles/tech-stack.html" },
     { "source": "/tech-stack.html", "destination": "/htmlfiles/tech-stack.html" },
     { "source": "/api/send-email", "destination": "/api/send-email.php" },

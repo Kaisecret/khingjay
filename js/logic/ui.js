@@ -1,10 +1,13 @@
-import { SKILLS, EXPERIENCE, PROJECT_EXPERIENCE, EDUCATION, ACHIEVEMENTS, PROJECTS, TECH_ICONS, designProjects, certificates, awards, gallery, techStack } from './data.js';
+import { SKILLS, EXPERIENCE, PROJECT_EXPERIENCE, EDUCATION, ACHIEVEMENTS, PROJECTS, TECH_ICONS, CASE_STUDIES, designProjects, certificates, awards, gallery, techStack } from './data.js';
 import { createProfileThemeSwapController } from './profileThemeSwap.mjs';
 
 const INITIAL_PROJECT_LIMIT = 6;
 const INITIAL_EXPERIENCE_LIMIT = 1;
 const EXPERIENCE_PAGE_URL = 'experience.html';
 const PROJECT_PAGE_URL = 'project.html';
+const CASE_STUDY_PAGE_URL = 'case-study.html';
+const WORDS_PER_MINUTE = 200;
+const SCREEN_FAN_SWIPE_PX = 40;
 const THEME_REVEAL_DURATION_MS = 850;
 const THEME_REVEAL_EASING = 'cubic-bezier(0.65, 0, 0.35, 1)';
 const THEME_FADE_DURATION_MS = 350;
@@ -48,6 +51,12 @@ export function initProjectPage() {
   renderProjectPage();
   setupNavbarAndTheme();
   setupDemoModal();
+}
+
+export function initCaseStudyPage() {
+  lucide.createIcons();
+  renderCaseStudyPage();
+  setupNavbarAndTheme();
 }
 
 function runThemeTransition(toggle, applyTheme) {
@@ -266,6 +275,21 @@ function renderTechIcon(name, { isDecorative = false } = {}) {
   return `<img src="${iconUrl}" alt="${isDecorative ? '' : name}" ${isDecorative ? '' : `title="${name}"`} loading="lazy" class="tech-icon w-[18px] h-[18px]">`;
 }
 
+function renderAwardBadge(award, tone) {
+  if (tone === 'champion') return `<span class="hl-chip hl-champion"><i data-lucide="trophy"></i>${award}</span>`;
+  return `<span class="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-sm font-medium text-amber-700 dark:text-amber-300"><i data-lucide="trophy" class="w-3.5 h-3.5"></i>${award}</span>`;
+}
+
+// Small chips for event, judge, and award highlights; the judge's name takes the project's brand blue.
+function renderHighlights(highlights = []) {
+  return highlights.map((highlight) => {
+    const icon = highlight.icon ? `<i data-lucide="${highlight.icon}"></i>` : '';
+    if (highlight.tone === 'judge') return `<span class="hl-chip hl-judge-chip">${icon}${highlight.label} <strong class="hl-judge">${highlight.text}</strong></span>`;
+    const toneClass = { champion: 'hl-champion', award: 'hl-award' }[highlight.tone] || '';
+    return `<span class="hl-chip ${toneClass}">${icon}${highlight.text}</span>`;
+  }).join('');
+}
+
 function renderProjectPage() {
   const container = document.getElementById('project-detail');
   const slug = new URLSearchParams(window.location.search).get('p');
@@ -288,7 +312,11 @@ function renderProjectPage() {
 
   container.innerHTML = `
     <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-      <p class="font-medium">${[getProjectLabel(project), project.period].filter(Boolean).join(' <span aria-hidden="true">&bull;</span> ')}</p>
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p class="font-medium">${[getProjectLabel(project), project.period].filter(Boolean).join(' <span aria-hidden="true">&bull;</span> ')}</p>
+        ${project.award ? renderAwardBadge(project.award, project.awardTone) : ''}
+        ${renderHighlights(project.highlights)}
+      </div>
       ${links.length ? `<p class="flex items-center gap-2">${links.join('<span class="text-muted" aria-hidden="true">/</span>')}</p>` : ''}
     </div>
     <h1 class="mt-4 text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-balance">${project.title}</h1>
@@ -296,12 +324,385 @@ function renderProjectPage() {
     <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2.5 font-medium">
       ${project.technologies.map((name) => `<li class="inline-flex items-center gap-2">${renderTechIcon(name, { isDecorative: true })}${name}</li>`).join('')}
     </ul>
-    <a href="${project.imageUrl}" target="_blank" rel="noopener noreferrer" class="mt-8 block overflow-hidden rounded-xl border border-line bg-surface cursor-zoom-in" aria-label="Open full image of ${project.title}">
-      <img src="${project.imageUrl}" alt="Screenshot of ${project.title}" class="w-full h-auto">
+    <a href="${project.imageUrl}" target="_blank" rel="noopener noreferrer" class="mt-8 block w-fit max-w-full overflow-hidden rounded-xl border border-line bg-surface cursor-zoom-in" aria-label="Open full image of ${project.title}">
+      <img src="${project.imageUrl}" alt="Screenshot of ${project.title}" class="block w-auto h-auto max-w-full max-h-[22rem] sm:max-h-[26rem]">
     </a>
+    ${CASE_STUDIES[slug] ? `
+      <div class="mt-10 flex flex-col items-start gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-lg font-semibold tracking-tight">Read the case study</p>
+          <p class="mt-1 text-soft text-pretty">My role, the features, the tech stack, every screen, and what I learned.</p>
+        </div>
+        <a href="${CASE_STUDY_PAGE_URL}?p=${slug}" class="btn btn-solid shrink-0">
+          View case study <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    ` : ''}
   `;
 
   lucide.createIcons();
+}
+
+const CASE_STUDY_SECTIONS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'role', label: 'My role' },
+  { id: 'team', label: 'The team' },
+  { id: 'features', label: 'Features' },
+  { id: 'tech-stack', label: 'Tech stack' },
+  { id: 'lessons', label: 'What I learned' },
+  { id: 'screens', label: 'Screens' }
+];
+
+function renderCaseStudySection(id, body) {
+  const { label } = CASE_STUDY_SECTIONS.find((section) => section.id === id);
+
+  return `
+    <section id="${id}" data-case-section class="scroll-mt-6 border-t border-line py-12 first:border-t-0 first:pt-0 sm:py-14">
+      <h2 class="text-3xl sm:text-4xl font-bold tracking-[-0.03em] leading-tight">${label}</h2>
+      ${body}
+    </section>
+  `;
+}
+
+function renderScreenFrame(screen, alt, frame) {
+  const image = `<img src="${screen.image}" alt="${alt}" loading="lazy" decoding="async" draggable="false">`;
+
+  if (frame === 'laptop') {
+    return `
+      <div class="laptop">
+        <div class="laptop-lid"><div class="laptop-screen">${image}</div></div>
+        <div class="laptop-base"></div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="iphone">
+      <div class="iphone-screen">${image}</div>
+      <div class="iphone-island"></div>
+    </div>
+  `;
+}
+
+function renderCaseStudyPage() {
+  const container = document.getElementById('case-study');
+  const backLink = document.getElementById('case-study-back');
+  const slug = new URLSearchParams(window.location.search).get('p');
+  const project = PROJECTS.find((candidate) => getProjectSlug(candidate) === slug);
+  const study = project ? CASE_STUDIES[slug] : null;
+
+  if (!study) {
+    container.innerHTML = `
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Case study not found.</h1>
+      <p class="mt-4 max-w-[65ch] text-base sm:text-lg text-soft">This link does not match any case study. Go back to see all projects.</p>
+    `;
+    return;
+  }
+
+  const projectUrl = `${PROJECT_PAGE_URL}?p=${slug}`;
+  const sections = CASE_STUDY_SECTIONS.filter((section) => section.id !== 'team' || study.team);
+  const screenSets = study.screenSets || [{
+    frame: study.frame,
+    screenRatio: study.screenRatio,
+    initialScreen: study.initialScreen,
+    screens: study.screens
+  }];
+  backLink.href = projectUrl;
+  backLink.querySelector('span').textContent = `Back to ${project.title}`;
+  document.title = `${project.title} Case Study | Khing Jay Regala`;
+
+  const paragraph = (text) => `<p class="mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${text}</p>`;
+
+  const article = [
+    renderCaseStudySection('overview', `<div class="mt-2">${study.why.map(paragraph).join('')}</div>`),
+
+    renderCaseStudySection('role', `
+      ${paragraph(study.role.summary)}
+      <ul class="mt-6 space-y-3.5">
+        ${study.role.duties.map((duty) => `
+          <li class="flex gap-3 max-w-[65ch]">
+            <i data-lucide="check" class="mt-1 w-4 h-4 shrink-0 text-accent"></i>
+            <span class="leading-relaxed text-pretty">${duty}</span>
+          </li>
+        `).join('')}
+      </ul>
+    `),
+
+    study.team ? renderCaseStudySection('team', `
+      ${paragraph(study.team.summary)}
+      <figure class="mt-8">
+        <img src="${study.team.photo}" alt="${study.team.photoAlt}" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-xl border border-line object-cover ${study.team.photoFocus || 'object-[50%_68%]'} sm:aspect-[16/10]">
+        <figcaption class="mt-3 text-sm text-muted">${study.team.caption}</figcaption>
+      </figure>
+      ${study.team.eventPhotos ? `
+        <div class="mt-4 grid gap-4 ${study.team.eventPhotos.length >= 3 ? 'sm:grid-cols-3' : 'grid-cols-2'}">
+          ${study.team.eventPhotos.map((photo) => `
+            <figure>
+              <img src="${photo.image}" alt="${photo.alt}" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-lg border border-line object-cover ${photo.focus || ''}">
+              ${photo.caption ? `<figcaption class="mt-2 text-sm text-muted">${photo.caption}</figcaption>` : ''}
+            </figure>
+          `).join('')}
+        </div>
+      ` : ''}
+      <ul class="mt-8 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+        ${study.team.members.map((member) => `
+          <li class="flex items-center gap-3">
+            ${member.photo
+              ? `<img src="${member.photo}" alt="" loading="lazy" decoding="async" class="h-11 w-11 shrink-0 rounded-full border border-line object-cover">`
+              : `<span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface font-mono text-xs font-medium text-soft">${member.name.split(' ').filter((part) => /^[A-Z]/.test(part)).slice(0, 2).map((part) => part[0]).join('')}</span>`}
+            <span class="min-w-0">
+              <span class="flex items-center gap-2 font-medium">${member.name}${member.isMe ? '<span class="tag">me</span>' : ''}</span>
+              <span class="block text-sm text-muted">${member.role}</span>
+            </span>
+          </li>
+        `).join('')}
+      </ul>
+    `) : '',
+
+    renderCaseStudySection('features', `
+      <ul class="mt-8 grid gap-3 sm:grid-cols-2">
+        ${study.features.map((feature) => `
+          <li class="rounded-lg border border-line bg-card p-5">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-line bg-surface text-accent">
+              <i data-lucide="${feature.icon}" class="w-[18px] h-[18px]"></i>
+            </span>
+            <h3 class="mt-4 font-semibold tracking-tight">${feature.title}</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-soft text-pretty">${feature.text}</p>
+          </li>
+        `).join('')}
+      </ul>
+    `),
+
+    renderCaseStudySection('tech-stack', `
+      <dl class="mt-8 border-t border-line">
+        ${study.stack.map((group) => `
+          <div class="grid gap-2 border-b border-line py-4 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-6">
+            <dt class="text-xs font-semibold uppercase tracking-[0.08em] text-muted sm:pt-1">${group.group}</dt>
+            <dd class="flex flex-wrap gap-x-5 gap-y-2 font-medium">
+              ${group.items.map((name) => `<span class="inline-flex items-center gap-2">${renderTechIcon(name, { isDecorative: true })}${name}</span>`).join('')}
+            </dd>
+          </div>
+        `).join('')}
+      </dl>
+      <h3 class="mt-10 text-xl font-semibold tracking-tight">${study.pipelineTitle}</h3>
+      <ol class="mt-5 space-y-3.5">
+        ${study.pipeline.map((step, index) => `
+          <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-2 max-w-[65ch]">
+            <span class="font-mono text-sm text-muted tabular-nums">${String(index + 1).padStart(2, '0')}</span>
+            <span class="leading-relaxed text-pretty">${step}</span>
+          </li>
+        `).join('')}
+      </ol>
+    `),
+
+    renderCaseStudySection('lessons', `
+      <div class="mt-8 space-y-7">
+        ${study.lessons.map((lesson) => `
+          <div class="max-w-[65ch] border-l-2 border-accent/60 pl-4">
+            <h3 class="font-semibold tracking-tight">${lesson.title}</h3>
+            <p class="mt-1.5 leading-relaxed text-soft text-pretty">${lesson.text}</p>
+          </div>
+        `).join('')}
+      </div>
+    `),
+
+    renderCaseStudySection('screens', `
+      ${paragraph(study.screensIntro)}
+      ${screenSets.map((set) => `
+        ${set.title ? `
+          <h3 class="mt-12 text-xl font-semibold tracking-tight">${set.title}</h3>
+          ${set.intro ? `<p class="mt-1.5 text-soft">${set.intro}</p>` : ''}
+        ` : ''}
+        <div class="screen-fan screen-fan--${set.frame || 'phone'} mt-6" data-initial="${set.initialScreen || 0}"${set.screenRatio ? ` style="--screen-ratio: ${set.screenRatio}"` : ''}>
+          <div class="screen-fan-stage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="${[project.title, set.title, 'screens'].filter(Boolean).join(' ')}">
+            ${set.screens.map((screen) => `
+              <div class="fan-item">${renderScreenFrame(screen, `${screen.title} screen of ${project.title}`, set.frame || 'phone')}</div>
+            `).join('')}
+          </div>
+          <div class="mt-5 grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-start gap-3">
+            <button type="button" class="icon-btn border border-line bg-card" data-fan-prev aria-label="Previous screen">
+              <i data-lucide="chevron-left" class="w-[18px] h-[18px]"></i>
+            </button>
+            <div class="min-h-[5.5rem] text-center" aria-live="polite">
+              <p class="font-mono text-xs text-muted tabular-nums"><span data-fan-count></span> / ${String(set.screens.length).padStart(2, '0')}</p>
+              <p class="mt-1 font-semibold tracking-tight" data-fan-title></p>
+              <p class="mx-auto mt-1 max-w-[48ch] text-sm text-soft text-pretty" data-fan-caption></p>
+            </div>
+            <button type="button" class="icon-btn border border-line bg-card" data-fan-next aria-label="Next screen">
+              <i data-lucide="chevron-right" class="w-[18px] h-[18px]"></i>
+            </button>
+          </div>
+          <div class="mt-3 flex flex-wrap justify-center gap-1">
+            ${set.screens.map((screen, index) => `
+              <button type="button" class="fan-dot" data-fan-dot="${index}" aria-label="Show ${screen.title}"><span></span></button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    `)
+  ].join('');
+
+  container.innerHTML = `
+    <p class="font-mono text-xs text-muted">
+      Case study <span aria-hidden="true">&bull;</span> ${project.period || getProjectLabel(project)} <span aria-hidden="true">&bull;</span> <span data-read-time></span>
+    </p>
+    <h1 class="mt-4 max-w-[20ch] text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-balance">${study.headline}</h1>
+    <p class="mt-5 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${study.intro}</p>
+
+    <a href="${projectUrl}" class="card mt-8 flex-row items-center gap-4 p-3">
+      <span class="block aspect-video w-24 shrink-0 overflow-hidden rounded-md border border-line bg-surface sm:w-32">
+        <img src="${project.imageUrl}" alt="" class="card-thumb w-full h-full object-cover">
+      </span>
+      <span class="min-w-0">
+        <span class="block font-semibold tracking-tight">${project.title}</span>
+        <span class="mt-0.5 text-sm text-soft line-clamp-2">${project.description}</span>
+      </span>
+      <i data-lucide="arrow-up-right" class="ml-auto hidden w-5 h-5 shrink-0 text-muted sm:block"></i>
+    </a>
+
+    <nav aria-label="Case study sections" class="sticky top-14 z-30 -mx-5 mt-14 bg-background/90 px-5 backdrop-blur-md sm:-mx-8 sm:px-8">
+      <ul class="case-tabs no-scrollbar flex gap-7 overflow-x-auto">
+        ${sections.map((section) => `<li class="shrink-0"><a href="#${section.id}" class="case-tab" data-tab="${section.id}">${section.label}</a></li>`).join('')}
+      </ul>
+    </nav>
+
+    <div class="mt-12 grid gap-12 sm:mt-16 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-16">
+      <aside class="lg:sticky lg:top-36 lg:self-start">
+        <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <i data-lucide="info" class="w-4 h-4"></i> Details
+        </p>
+        <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-1">
+          ${study.facts.map((fact) => `
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-[0.08em] text-muted">${fact.label}</dt>
+              <dd class="mt-1 leading-snug text-soft ${fact.chips ? 'flex flex-wrap gap-1.5' : ''}">${fact.tone === 'champion' ? `<span class="hl-chip hl-champion"><i data-lucide="trophy"></i>${fact.value}</span>` : fact.tone === 'judge' ? `<span class="hl-judge">${fact.value}</span>` : fact.value}${fact.chips ? renderHighlights(fact.chips) : ''}</dd>
+            </div>
+          `).join('')}
+        </dl>
+      </aside>
+      <div class="min-w-0">${article}</div>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-8">
+      <a href="${projectUrl}" class="btn btn-outline"><i data-lucide="chevron-left" class="w-4 h-4"></i> Back to ${project.title}</a>
+      <a href="#projects" class="btn btn-outline">Back to top <i data-lucide="arrow-up" class="w-4 h-4"></i></a>
+    </div>
+  `;
+
+  const wordCount = container.textContent.trim().split(/\s+/).length;
+  container.querySelector('[data-read-time]').textContent = `${Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE))} min read`;
+
+  setupCaseStudyTabs(container);
+  container.querySelectorAll('.screen-fan').forEach((fan, index) => setupScreenFan(fan, screenSets[index].screens));
+  lucide.createIcons();
+}
+
+// Underlines the tab of the section currently in the reading band.
+function setupCaseStudyTabs(container) {
+  const list = container.querySelector('.case-tabs');
+  const tabs = Array.from(list.querySelectorAll('.case-tab'));
+
+  const setActive = (id) => {
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.tab === id;
+      tab.classList.toggle('is-active', isActive);
+      if (isActive) {
+        tab.setAttribute('aria-current', 'true');
+        list.scrollTo({ left: tab.parentElement.offsetLeft - 20, behavior: 'smooth' });
+      } else {
+        tab.removeAttribute('aria-current');
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-35% 0px -60% 0px' });
+
+  container.querySelectorAll('[data-case-section]').forEach((section) => observer.observe(section));
+  setActive(tabs[0].dataset.tab);
+}
+
+// Screens fanned out like a hand of cards; the active one sits in front.
+function setupScreenFan(fan, screens) {
+  const stage = fan.querySelector('.screen-fan-stage');
+  const items = Array.from(fan.querySelectorAll('.fan-item'));
+  const dots = Array.from(fan.querySelectorAll('[data-fan-dot]'));
+  const counter = fan.querySelector('[data-fan-count]');
+  const title = fan.querySelector('[data-fan-title]');
+  const caption = fan.querySelector('[data-fan-caption]');
+  const total = items.length;
+  let active = 0;
+
+  const show = (index) => {
+    active = (index + total) % total;
+
+    items.forEach((item, itemIndex) => {
+      let offset = itemIndex - active;
+      if (offset > total / 2) offset -= total;
+      if (offset < -total / 2) offset += total;
+      const distance = Math.abs(offset);
+
+      item.style.setProperty('--offset', offset);
+      item.style.setProperty('--distance', distance);
+      item.style.zIndex = String(total - distance);
+      item.dataset.depth = ['active', 'near', 'mid'][distance] || 'far';
+      item.setAttribute('aria-hidden', String(distance !== 0));
+    });
+
+    dots.forEach((dot, dotIndex) => {
+      dot.setAttribute('aria-current', String(dotIndex === active));
+    });
+
+    counter.textContent = String(active + 1).padStart(2, '0');
+    title.textContent = screens[active].title;
+    caption.textContent = screens[active].caption;
+  };
+
+  let swipeStartX = null;
+  let didSwipe = false;
+
+  stage.addEventListener('pointerdown', (e) => {
+    swipeStartX = e.clientX;
+    didSwipe = false;
+  });
+
+  stage.addEventListener('pointerup', (e) => {
+    if (swipeStartX === null) return;
+    const deltaX = e.clientX - swipeStartX;
+    swipeStartX = null;
+    if (Math.abs(deltaX) < SCREEN_FAN_SWIPE_PX) return;
+    didSwipe = true;
+    show(active + (deltaX < 0 ? 1 : -1));
+  });
+
+  stage.addEventListener('pointercancel', () => {
+    swipeStartX = null;
+  });
+
+  stage.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(active - 1);
+    else if (e.key === 'ArrowRight') show(active + 1);
+    else return;
+    e.preventDefault();
+  });
+
+  items.forEach((item, index) => {
+    item.addEventListener('click', () => {
+      if (!didSwipe) show(index);
+    });
+  });
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => show(index));
+  });
+
+  fan.querySelector('[data-fan-prev]').addEventListener('click', () => show(active - 1));
+  fan.querySelector('[data-fan-next]').addEventListener('click', () => show(active + 1));
+
+  show(Number(fan.dataset.initial) || 0);
 }
 
 function renderSkills() {
@@ -415,8 +816,10 @@ function renderGrid(category, subTab = null) {
 
       content = displayedProjects.map((p) => `
         <article class="card p-4">
-          <div class="aspect-video overflow-hidden rounded-md border border-line bg-surface">
+          <div class="relative aspect-video overflow-hidden rounded-md border border-line bg-surface">
             <img src="${p.imageUrl}" alt="" loading="lazy" class="card-thumb w-full h-full object-cover">
+            ${p.award && p.awardTone === 'champion' ? `<span class="hl-chip hl-champion absolute right-2 top-2"><i data-lucide="trophy"></i>${p.award}</span>` : ''}
+            ${p.award && p.awardTone !== 'champion' ? `<span class="absolute right-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm"><i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-300"></i>${p.award}</span>` : ''}
           </div>
           <h3 class="mt-4 text-lg font-semibold tracking-tight leading-snug text-balance">
             <a href="${PROJECT_PAGE_URL}?p=${getProjectSlug(p)}" class="after:absolute after:inset-0">${p.title}</a>
@@ -535,6 +938,7 @@ function renderGallerySection() {
       </div>
       <div class="p-4">
         <h3 class="font-semibold tracking-tight leading-snug">${item.title}</h3>
+        ${item.detail ? `<p class="mt-1 text-sm text-soft">${item.detail}</p>` : ''}
       </div>
     </div>
   `).join('');
