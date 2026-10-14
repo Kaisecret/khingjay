@@ -142,6 +142,7 @@ export const PROJECTS = [
   {
     id: 0,
     title: 'WattSnap AI',
+    summary: 'Understand your bills, save power, and plan for brownouts.',
     description: 'A home electricity assistant that reads your bill, shows which appliances use the most power, suggests ways to save, tracks a monthly budget, and flags ANTECO brownout advisories for your barangay, even offline.',
     technologies: ['Next.js', 'React', 'TypeScript', 'Supabase', 'Vercel'],
     projectLabel: 'Hackathon',
@@ -161,6 +162,7 @@ export const PROJECTS = [
   {
     id: 1,
     title: 'Meedocentrix Enterprise System',
+    summary: 'Manage municipal transactions, fees, and reports.',
     description: 'A web-based data management system for the MEEDO office of San Jose, Antique. It records fishport, market, terminal, cemetery, and atrium hall transactions, computes fees automatically, and generates revenue and occupancy reports.',
     technologies: ['PHP', 'Laravel', 'MySQL', 'JavaScript', 'Bootstrap'],
     imageUrl: coverPath('meedocentrix'),
@@ -172,6 +174,7 @@ export const PROJECTS = [
   {
     id: 2,
     title: 'ARPS',
+    summary: 'Send SOS alerts and find evacuation centers.',
     description: 'An installable disaster-readiness web app for Antique. Residents send SOS alerts that fall back to SMS when offline, find the nearest evacuation center, and check live weather, while the MDRRMO tracks every report on a live map.',
     technologies: ['JavaScript', 'Tailwind', 'Firebase', 'Leaflet', 'PWA'],
     imageUrl: coverPath('arps'),
@@ -183,6 +186,7 @@ export const PROJECTS = [
   {
     id: 3,
     title: 'Aria\'s Pharmora',
+    summary: 'Track pharmacy stock, sales, and expiry dates.',
     description: 'A web-based pharmacy inventory and sales system for Aria\'s Pharmacy in Sibalom, Antique, with point-of-sale billing and discounts, batch and expiry tracking, low-stock alerts, sales forecasting, and PDF and Excel reports.',
     technologies: ['React', 'Laravel', 'PHP', 'MySQL', 'Tailwind'],
     projectLabel: 'School Project',
@@ -193,6 +197,7 @@ export const PROJECTS = [
   {
     id: 4,
     title: 'AgriPalAI',
+    summary: 'Scan rice leaves for disease and treatment tips.',
     description: 'A smart crop-care mobile app that scans plant images to detect diseases, gives instant treatment guidance, provides weather insights, and includes an AI farming assistant for daily support.',
     technologies: ['Python', 'AI', 'Computer Vision', 'Weather API', 'Mobile UI'],
     projectLabel: 'School Project',
@@ -204,6 +209,7 @@ export const PROJECTS = [
   {
     id: 5,
     title: 'PhysiqueCheck',
+    summary: 'Analyze your physique and get a workout plan.',
     description: 'A web app that reads simple body photos, explains which muscles look strong and which need more work, and gives a weekly workout plan, a daily schedule, and easy meals that match your goal.',
     technologies: ['PHP', 'MySQL', 'Python', 'Tailwind', 'PyCharm', 'VS Code', 'XAMPP'],
     projectLabel: 'School Project',
@@ -214,6 +220,7 @@ export const PROJECTS = [
   {
     id: 6,
     title: 'SmartChoice',
+    summary: 'Find college courses that match your strengths.',
     description: "A web-based course recommender for senior high students at St. Anthony's College. It matches college courses to each student's strand, interests, and skills, and gives guidance counselors a dashboard of results.",
     technologies: ['PHP', 'JavaScript', 'MySQL', 'Tailwind', 'VS Code'],
     projectLabel: 'School Project',
@@ -224,6 +231,7 @@ export const PROJECTS = [
   {
     id: 7,
     title: 'ORR Beach Resort',
+    summary: 'Explore resort rooms, dining, and booking details.',
     description: 'A responsive website for ORR Beach Resort in Banawon, Hamtic, Antique that shows its rooms, amenities, dining, and scenery, and helps guests send a booking inquiry or find their way there.',
     technologies: ['HTML5', 'CSS', 'Tailwind', 'JavaScript', 'Vercel'],
     projectLabel: 'Web Project',

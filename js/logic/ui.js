@@ -871,7 +871,7 @@ function renderGrid(category, subTab = null) {
           <h3 class="mt-4 text-lg font-semibold tracking-tight leading-snug text-balance">
             <a href="${PROJECT_PAGE_URL}?p=${getProjectSlug(p)}" class="after:absolute after:inset-0">${p.title}</a>
           </h3>
-          <p class="mt-1.5 text-soft line-clamp-2">${p.description}</p>
+          <p class="project-card-summary mt-1.5 text-soft">${p.summary}</p>
           <div class="mt-auto flex flex-wrap items-center gap-3 pt-4 text-muted">
             ${p.demoUrl !== '#' ? `<a href="#" data-demo-url="${p.demoUrl}" class="demo-link relative z-10 -m-1.5 p-1.5 transition-colors hover:text-foreground" aria-label="Live demo of ${p.title}"><i data-lucide="external-link" class="w-[18px] h-[18px]"></i></a>` : ''}
             ${p.codeUrl !== '#' ? `<a href="${p.codeUrl}" target="_blank" rel="noopener noreferrer" class="relative z-10 -m-1.5 p-1.5 transition-colors hover:text-foreground" aria-label="Source code of ${p.title}">${GITHUB_ICON}</a>` : ''}
