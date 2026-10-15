@@ -125,6 +125,14 @@ input, textarea {
     text-decoration-color: rgb(var(--foreground));
 }
 
+/* Align the introduction with the shared page edge on desktop and mobile. */
+.hero-description {
+    width: 100%;
+    text-align: justify;
+    text-align-last: start;
+    hyphens: auto;
+}
+
 /* Header: at the top of the page only the theme toggle shows; the bar arrives on scroll */
 #navbar {
     transition: background-color 0.25s ease-out, border-color 0.25s ease-out;
