@@ -132,12 +132,6 @@ input, textarea {
     hyphens: none;
 }
 
-@media (max-width: 639px) {
-    .hero-description {
-        text-align: center;
-    }
-}
-
 /* Header: at the top of the page only the theme toggle shows; the bar arrives on scroll */
 #navbar {
     transition: background-color 0.25s ease-out, border-color 0.25s ease-out;
