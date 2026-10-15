@@ -125,12 +125,11 @@ input, textarea {
     text-decoration-color: rgb(var(--foreground));
 }
 
-/* Align the introduction with the shared page edge on desktop and mobile. */
+/* Keep the full page width with natural spacing and whole-word wrapping. */
 .hero-description {
     width: 100%;
-    text-align: justify;
-    text-align-last: start;
-    hyphens: auto;
+    text-align: start;
+    hyphens: none;
 }
 
 /* Header: at the top of the page only the theme toggle shows; the bar arrives on scroll */
