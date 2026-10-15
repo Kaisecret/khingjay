@@ -12,7 +12,8 @@ function formatBotText(text) {
 }
 
 const FALLBACK_FULL = `Name: Khing Jay Regala
-Role: Full stack developer with an AI-driven workflow
+Role: Full stack developer using an AI-driven development workflow
+About: Khing Jay enjoys solving problems, learning new technologies, and collaborating with a team. He uses AI to research ideas, plan features, write and refine code, and troubleshoot issues. He stays hands-on with technical decisions, code review, and testing, and specializes in databases, AI integration, and automation.
 Email: regalakhing@sac.edu.ph
 Phone: 09382604239
 Location: Mapatag Hamtic Antique
