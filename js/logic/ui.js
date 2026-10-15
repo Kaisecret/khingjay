@@ -567,6 +567,22 @@ function renderCaseStudyPage() {
           <h3 class="mt-12 text-xl font-semibold tracking-tight">${set.title}</h3>
           ${set.intro ? `<p class="mt-1.5 text-soft">${set.intro}</p>` : ''}
         ` : ''}
+        ${study.screensLayout === 'grid' ? `
+          <div class="case-screen-grid">
+            ${set.screens.map((screen) => `
+              <figure>
+                <button type="button" class="photo-trigger case-screen-preview" data-photo-gallery="case-screens-${slug}" aria-label="View ${screen.title}" aria-haspopup="dialog">
+                  <img src="${screen.image}" alt="${screen.title} screen of ${project.title}" loading="lazy" decoding="async">
+                  <span class="case-screen-view" aria-hidden="true"><i data-lucide="maximize-2"></i> View</span>
+                </button>
+                <figcaption>
+                  <span class="case-screen-title">${screen.title}</span>
+                  <span class="case-screen-description">${screen.caption}</span>
+                </figcaption>
+              </figure>
+            `).join('')}
+          </div>
+        ` : `
         <div class="screen-fan screen-fan--${set.frame || 'phone'} mt-6" data-initial="${set.initialScreen || 0}"${set.screenRatio ? ` style="--screen-ratio: ${set.screenRatio}"` : ''}>
           <div class="screen-fan-stage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="${[project.title, set.title, 'screens'].filter(Boolean).join(' ')}">
             ${set.screens.map((screen) => `
@@ -597,6 +613,7 @@ function renderCaseStudyPage() {
             </button>
           </div>
         </div>
+        `}
       `).join('')}
     `)
   ].join('');

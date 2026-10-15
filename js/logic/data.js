@@ -903,7 +903,8 @@ CASE_STUDIES.smartchoice = {
     { title: 'Design for two audiences', text: 'Students need a clear next step and a manageable shortlist. Counselors need searchable records, assessment status, and summaries. Separate workspaces keep each role focused on its own tasks.' },
     { title: 'Make a long assessment manageable', text: 'Breaking the questions into five steps gives each section one clear purpose. Progress indicators, familiar strand names, and plain question labels help students understand where they are and what to answer next.' }
   ],
-  screensIntro: 'The student journey and counselor workspace use the same maroon-and-white identity. Use the arrows, swipe, or tap a screen to bring it forward, then choose View full size for a closer look.',
+  screensIntro: 'All 14 screens, from the student journey to the counselor workspace. Select any image to view it full size, then use the arrows to browse the complete gallery.',
+  screensLayout: 'grid',
   screenSets: [
     {
       title: 'Student journey',
