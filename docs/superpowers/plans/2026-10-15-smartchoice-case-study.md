@@ -5,8 +5,11 @@
 Add SmartChoice to the existing portfolio case-study format using the user's
 project write-up and screenshots. Attribute the role as Full-stack developer.
 Keep the current project-card summary, responsive preview, reading time,
-section tabs and full-size image viewer. Display all SmartChoice screenshots
-directly in the article, grouped into student and counselor screens.
+section tabs, laptop screen carousel, and full-size image viewer.
+
+The screen presentation follows the same fan carousel as the other case
+studies, using laptop frames for the desktop UI. All 14 original screenshots
+remain available: nine student screens and five counselor screens.
 
 ## Content boundaries
 
@@ -27,7 +30,7 @@ directly in the article, grouped into student and counselor screens.
 - [x] Add optional objectives rendering and reading-time support in
   `js/logic/ui.js`, preserving the existing layout for all other projects.
 - [x] Add available original screen images under `images/smartchoice/` and
-  connect them to student and counselor screen sets.
+  connect them to student and counselor laptop screen sets.
 - [x] Verify the SmartChoice preview, all sections, role, objectives, screen
   navigation, image loading, full-size viewer, desktop/mobile layout, and
   existing case-study routes. Run the existing Node tests and diff checks.
@@ -44,18 +47,8 @@ results or verified adoption statistics.
 ## Verification
 
 Browser checks passed at 320, 390, 768, and 1366 pixels, including all 14
-original images, both screenshot groups, full-size navigation and wraparound,
-and consistent reading time. All eight case studies render; other projects'
-nine carousel screen sets open and navigate. The four existing Node tests, JavaScript syntax checks,
+original images, both laptop carousels, full-size navigation and wraparound,
+and consistent reading time. All eight case studies and their 11 screen sets
+render and navigate. The four existing Node tests, JavaScript syntax checks,
 and `git diff --check` passed. Visual inspection and an independent code review
 found no issues.
-
-## Follow-up: display every screen
-
-The user requested that all 14 UI screenshots be directly visible. SmartChoice
-now opts into a two-column desktop and one-column mobile thumbnail grid.
-Every image opens the shared popup at its own position in a single 14-image
-gallery, including navigation between the student and counselor groups.
-Existing case studies keep their carousels. Browser checks confirm every
-thumbnail and full-size image loads, navigation wraps, focus returns to the
-clicked thumbnail, and the page fits mobile and desktop widths.
