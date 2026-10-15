@@ -297,6 +297,8 @@ function getCaseStudyReadTime(study) {
     study.headline,
     study.intro,
     ...study.why,
+    study.objectives?.general || '',
+    ...(study.objectives?.specific || []),
     study.role.summary,
     ...study.role.duties,
     study.team?.summary || '',
@@ -446,7 +448,23 @@ function renderCaseStudyPage() {
   const paragraph = (text) => `<p class="mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${text}</p>`;
 
   const article = [
-    renderCaseStudySection('overview', `<div class="mt-2">${study.why.map(paragraph).join('')}</div>`),
+    renderCaseStudySection('overview', `
+      <div class="mt-2">${study.why.map(paragraph).join('')}</div>
+      ${study.objectives ? `
+        <div class="mt-8">
+          <h3 class="text-xl font-semibold tracking-tight">Project objectives</h3>
+          ${paragraph(study.objectives.general)}
+          <ol class="mt-5 space-y-3.5">
+            ${study.objectives.specific.map((objective, index) => `
+              <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-2 max-w-[65ch]">
+                <span class="font-mono text-sm text-muted tabular-nums">${String(index + 1).padStart(2, '0')}</span>
+                <span class="leading-relaxed text-pretty">${objective}</span>
+              </li>
+            `).join('')}
+          </ol>
+        </div>
+      ` : ''}
+    `),
 
     renderCaseStudySection('role', `
       ${paragraph(study.role.summary)}

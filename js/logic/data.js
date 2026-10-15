@@ -837,6 +837,107 @@ CASE_STUDIES['wattsnap-ai'] = {
   ]
 };
 
+const smartchoiceScreen = (name) => `/images/smartchoice/${name}.png`;
+
+CASE_STUDIES.smartchoice = {
+  headline: 'A clearer college pathway, starting with your strand',
+  intro: 'SmartChoice is a web-based course recommendation platform for senior high school students at Saint Anthony\'s College. It brings a student\'s strand, interests, and skills into one guided assessment, then suggests college courses to explore. A separate counselor workspace helps staff review student records and assessment activity.',
+  facts: [
+    { label: 'Role', value: 'Full-stack developer' },
+    { label: 'Project type', value: 'School project' },
+    { label: 'Platform', value: 'Web' },
+    { label: 'Built for', value: 'Senior high school students, Saint Anthony\'s College' },
+    { label: 'Users', value: 'Students and guidance counselors' }
+  ],
+  why: [
+    'Choosing a college course can feel like choosing a whole future before a student knows where to start. At Saint Anthony\'s College, students need to weigh their senior high school strand, the subjects they enjoy, their skills, and the careers they want to explore.',
+    'A list of available programs does not explain which options fit a particular student. Individual guidance also takes time, and teachers and counselors have many students to support. SmartChoice gives that first conversation some structure: answer questions, review suitable options, and bring a clearer shortlist to a counselor.',
+    'The goal is a clearer transition from senior high school to college. Students can turn their assessment into a shortlist, compare course details, and use that information when discussing their next steps with a guidance counselor.'
+  ],
+  objectives: {
+    general: 'Develop a personalized, strand-based guidance system that helps senior high school students explore college courses suited to their academic background, interests, and skills.',
+    specific: [
+      'Design a recommendation framework that considers the student\'s strand, interests, and skills together.',
+      'Build an accessible web application with structured questions and clear, personalized course suggestions.',
+      'Support informed course selection and a smoother transition to college, with the aim of reducing mismatched choices and unnecessary program shifting.'
+    ]
+  },
+  role: {
+    summary: 'I worked as the full-stack developer on SmartChoice, connecting the student-facing assessment and recommendation flow with the PHP backend, MySQL records, and counselor workspace.',
+    duties: [
+      'Built the web interface with HTML, CSS, Tailwind, and JavaScript, following the college\'s maroon-and-white identity.',
+      'Developed the account, sign-in, email verification, and profile flows in PHP.',
+      'Connected student profiles, strands, assessments, and saved courses through MySQL.',
+      'Implemented the five-step assessment and course-matching flow using the student\'s strand and answers.',
+      'Built course recommendation cards, detailed course views, and bookmarks so students could compare and revisit options.',
+      'Built the counselor dashboard, student search and strand filters, assessment-status views, and CSV export workflows.'
+    ]
+  },
+  features: [
+    { icon: 'user-check', title: 'Student accounts', text: 'Students register, confirm their email, and keep their strand and profile information together for later assessments.' },
+    { icon: 'clipboard-list', title: 'A guided assessment', text: 'A five-step questionnaire breaks the process into manageable sections about the student\'s academic track, interests, and skills.' },
+    { icon: 'graduation-cap', title: 'Strand-based suggestions', text: 'Course options are matched to the student\'s strand and assessment answers, then presented with a match score and relevant skills.' },
+    { icon: 'book-open', title: 'Course details and pathways', text: 'Each course can open into an overview, required skills, possible careers, study steps, and guidance for further exploration.' },
+    { icon: 'bookmark', title: 'Saved courses', text: 'Students bookmark promising courses and revisit their details while building a shortlist of options.' },
+    { icon: 'layout-dashboard', title: 'A counselor overview', text: 'The counselor workspace brings together student counts, strand distribution, course recommendation summaries, and recent assessment activity.' },
+    { icon: 'users', title: 'Student management', text: 'Counselors search by name or email, filter by strand, and review whether a student has completed an assessment.' },
+    { icon: 'file-down', title: 'Reports and CSV exports', text: 'The interface includes student-list, assessment-result, and course-statistics exports. Some reporting views use sample figures to demonstrate the workflow.' }
+  ],
+  stack: [
+    { group: 'Frontend', items: ['HTML5', 'CSS', 'JavaScript', 'Tailwind'] },
+    { group: 'Backend', items: ['PHP'] },
+    { group: 'Database', items: ['MySQL'] },
+    { group: 'Tools', items: ['VS Code'] }
+  ],
+  pipelineTitle: 'From assessment to a course shortlist',
+  pipeline: [
+    'The student creates an account, verifies their email, and confirms their strand and profile.',
+    'They complete the structured assessment about their interests, skills, and academic preferences.',
+    'The application scores course options against the answers and considers the student\'s strand.',
+    'The student reviews the suggested courses, opens their details, and saves options worth exploring.',
+    'Counselors review student records and assessment activity to support follow-up guidance.'
+  ],
+  lessons: [
+    { title: 'A strand is a starting point', text: 'A student\'s strand gives useful academic context, but it should not be the whole recommendation. Interests and skills help distinguish students who share the same track and give them different options to explore.' },
+    { title: 'Explain the recommendation', text: 'A percentage alone does not tell a student what to do next. Course descriptions, required skills, career possibilities, and study steps make the result useful for a conversation about college.' },
+    { title: 'Design for two audiences', text: 'Students need a clear next step and a manageable shortlist. Counselors need searchable records, assessment status, and summaries. Separate workspaces keep each role focused on its own tasks.' },
+    { title: 'Make a long assessment manageable', text: 'Breaking the questions into five steps gives each section one clear purpose. Progress indicators, familiar strand names, and plain question labels help students understand where they are and what to answer next.' }
+  ],
+  screensIntro: 'The student journey and counselor workspace use the same maroon-and-white identity. Use the arrows, swipe, or tap a screen to bring it forward, then choose View full size for a closer look.',
+  screenSets: [
+    {
+      title: 'Student journey',
+      intro: 'From the first visit to a saved shortlist of college courses.',
+      frame: 'laptop',
+      screenRatio: 2.1,
+      screens: [
+        { image: smartchoiceScreen('landing'), title: 'Welcome to SmartChoice', caption: 'Introduces strand-based course guidance and gives students a clear way to start.' },
+        { image: smartchoiceScreen('survey'), title: 'Survey and testimonials layout', caption: 'The landing-page survey and testimonial presentation. The figures shown are interface content, not verified evaluation results for this case study.' },
+        { image: smartchoiceScreen('verification'), title: 'Email verification', caption: 'A six-digit code confirms the student\'s email before continuing.' },
+        { image: smartchoiceScreen('home'), title: 'Student home', caption: 'The current strand, assessment entry point, recommendations, and saved courses.' },
+        { image: smartchoiceScreen('assessment'), title: 'Guided assessment', caption: 'Step-by-step questions connect the student\'s strand with their interests and skills.' },
+        { image: smartchoiceScreen('recommendations'), title: 'Recommended courses', caption: 'Course cards show a match score, aligned strands, key skills, and a details action.' },
+        { image: smartchoiceScreen('course-details'), title: 'Explore a course', caption: 'A focused detail view explains the course, skills, possible careers, and next steps.' },
+        { image: smartchoiceScreen('saved'), title: 'Saved courses', caption: 'Bookmarked courses remain together for comparison and further exploration.' },
+        { image: smartchoiceScreen('profile'), title: 'Student profile', caption: 'Students manage their contact details, strand-related profile, and profile photo.' }
+      ]
+    },
+    {
+      title: 'Counselor workspace',
+      intro: 'A separate view for following up on student records and assessment activity. Report examples illustrate the interface rather than verified usage results.',
+      frame: 'laptop',
+      screenRatio: 2.1,
+      screens: [
+        { image: smartchoiceScreen('admin-dashboard'), title: 'Counselor dashboard', caption: 'An overview of student and assessment activity, with strand and course summaries.' },
+        { image: smartchoiceScreen('admin-activity'), title: 'Assessment activity', caption: 'Strand distribution, recommended-course summaries, and recent student assessments.' },
+        { image: smartchoiceScreen('students'), title: 'Student management', caption: 'Searchable student records, strand filters, grade levels, and assessment status.' },
+        { image: smartchoiceScreen('reports'), title: 'Reports and analytics', caption: 'CSV export actions and a sample trend chart demonstrate the reporting workflow.' },
+        { image: smartchoiceScreen('admin-profile'), title: 'Counselor profile', caption: 'Profile information, account security, and account-management controls.' }
+      ]
+    }
+  ]
+};
+
 export const designProjects = [
   {
     id: 1,
