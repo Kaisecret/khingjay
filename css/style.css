@@ -125,16 +125,15 @@ input, textarea {
     text-decoration-color: rgb(var(--foreground));
 }
 
-/* Keep the full page width with natural spacing and whole-word wrapping. */
-.hero-description {
-    width: 100%;
+/* Body text: whole-word wrapping everywhere; on phones both edges line up (intro, timeline, project and case study text). */
+.mobile-justify {
     text-align: start;
     hyphens: none;
 }
 
 @media (max-width: 639px) {
     @supports (text-justify: inter-character) {
-        .hero-description {
+        .mobile-justify {
             text-align: justify;
             text-align-last: start;
             text-justify: inter-character;

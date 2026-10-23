@@ -4,9 +4,13 @@ import { openLightbox, setupLightbox } from './lightbox.mjs';
 
 const INITIAL_PROJECT_LIMIT = 6;
 const INITIAL_EXPERIENCE_LIMIT = 1;
-const EXPERIENCE_PAGE_URL = 'experience.html';
-const PROJECT_PAGE_URL = 'project.html';
-const CASE_STUDY_PAGE_URL = 'case-study.html';
+// The live site serves pages at clean routes (/project). Live Server has no vercel.json
+// rewrites and serves the raw files from /htmlfiles/, so local previews link to the .html files.
+const IS_RAW_FILE_PREVIEW = window.location.pathname.includes('/htmlfiles/');
+const getPageUrl = (name) => (IS_RAW_FILE_PREVIEW ? `${name}.html` : `/${name}`);
+const EXPERIENCE_PAGE_URL = getPageUrl('experience');
+const PROJECT_PAGE_URL = getPageUrl('project');
+const CASE_STUDY_PAGE_URL = getPageUrl('case-study');
 const WORDS_PER_MINUTE = 200;
 const SCREEN_FAN_SWIPE_PX = 40;
 const THEME_REVEAL_DURATION_MS = 850;
@@ -116,7 +120,16 @@ function runThemeTransition(toggle, applyTheme) {
   transition.finished.catch(() => {}).then(() => root.classList.remove('theme-switching'));
 }
 
+// Page links in the HTML use clean routes (/experience). Point them at the .html files in Live Server.
+function usePreviewPageLinks() {
+  if (!IS_RAW_FILE_PREVIEW) return;
+  document.querySelectorAll('a[href^="/experience"], a[href^="/tech-stack"], a[href^="/project"], a[href^="/case-study"]').forEach((link) => {
+    link.setAttribute('href', link.getAttribute('href').replace(/^\/([a-z-]+)/, '$1.html'));
+  });
+}
+
 function setupNavbarAndTheme() {
+  usePreviewPageLinks();
   const navbar = document.getElementById('navbar');
   const mobileMenu = document.getElementById('mobile-menu');
   const menuIcon = document.getElementById('menu-icon');
@@ -223,7 +236,7 @@ function renderTimelineItem(item, { isFull = false } = {}) {
       <div class="col-span-2 min-w-0 pt-3 ${isFull ? 'pb-10' : 'pb-2'} sm:col-span-1">
         <h3 class="text-lg font-semibold tracking-tight leading-snug">${item.role}</h3>
         <p class="mt-0.5 text-sm text-muted tabular-nums">${[item.period, item.duration].filter(Boolean).join(separator)}</p>
-        ${item.detail ? `<p class="mt-3 max-w-[65ch] text-pretty">${item.detail}</p>` : ''}
+        ${item.detail ? `<p class="mobile-justify mt-3 ${isFull ? '' : 'max-w-[65ch] '}text-pretty">${item.detail}</p>` : ''}
         ${isFull ? '' : `<a href="${EXPERIENCE_PAGE_URL}#${item.id}" class="link mt-3 text-sm text-muted">See more</a>`}
       </div>
     </li>
@@ -347,7 +360,7 @@ function renderProjectPage() {
       ${links.length ? `<p class="flex items-center gap-2">${links.join('<span class="text-muted" aria-hidden="true">/</span>')}</p>` : ''}
     </div>
     <h1 class="mt-4 text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-balance">${project.title}</h1>
-    <p class="mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${project.description}</p>
+    <p class="mobile-justify mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${project.description}</p>
     <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2.5 font-medium">
       ${project.technologies.map((name) => `<li class="inline-flex items-center gap-2">${renderTechIcon(name, { isDecorative: true })}${name}</li>`).join('')}
     </ul>
@@ -445,7 +458,7 @@ function renderCaseStudyPage() {
   backLink.querySelector('span').textContent = `Back to ${project.title}`;
   document.title = `${project.title} Case Study | Khing Jay Regala`;
 
-  const paragraph = (text) => `<p class="mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${text}</p>`;
+  const paragraph = (text) => `<p class="mobile-justify mt-4 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${text}</p>`;
 
   const article = [
     renderCaseStudySection('overview', `
@@ -458,7 +471,7 @@ function renderCaseStudyPage() {
             ${study.objectives.specific.map((objective, index) => `
               <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-2 max-w-[65ch]">
                 <span class="font-mono text-sm text-muted tabular-nums">${String(index + 1).padStart(2, '0')}</span>
-                <span class="leading-relaxed text-pretty">${objective}</span>
+                <span class="mobile-justify leading-relaxed text-pretty">${objective}</span>
               </li>
             `).join('')}
           </ol>
@@ -472,7 +485,7 @@ function renderCaseStudyPage() {
         ${study.role.duties.map((duty) => `
           <li class="flex gap-3 max-w-[65ch]">
             <i data-lucide="check" class="mt-1 w-4 h-4 shrink-0 text-accent"></i>
-            <span class="leading-relaxed text-pretty">${duty}</span>
+            <span class="mobile-justify leading-relaxed text-pretty">${duty}</span>
           </li>
         `).join('')}
       </ul>
@@ -521,7 +534,7 @@ function renderCaseStudyPage() {
               <i data-lucide="${feature.icon}" class="w-[18px] h-[18px]"></i>
             </span>
             <h3 class="mt-4 font-semibold tracking-tight">${feature.title}</h3>
-            <p class="mt-1.5 text-sm leading-relaxed text-soft text-pretty">${feature.text}</p>
+            <p class="mobile-justify mt-1.5 text-sm leading-relaxed text-soft text-pretty">${feature.text}</p>
           </li>
         `).join('')}
       </ul>
@@ -543,7 +556,7 @@ function renderCaseStudyPage() {
         ${study.pipeline.map((step, index) => `
           <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-2 max-w-[65ch]">
             <span class="font-mono text-sm text-muted tabular-nums">${String(index + 1).padStart(2, '0')}</span>
-            <span class="leading-relaxed text-pretty">${step}</span>
+            <span class="mobile-justify leading-relaxed text-pretty">${step}</span>
           </li>
         `).join('')}
       </ol>
@@ -554,7 +567,7 @@ function renderCaseStudyPage() {
         ${study.lessons.map((lesson) => `
           <div class="max-w-[65ch] border-l-2 border-accent/60 pl-4">
             <h3 class="font-semibold tracking-tight">${lesson.title}</h3>
-            <p class="mt-1.5 leading-relaxed text-soft text-pretty">${lesson.text}</p>
+            <p class="mobile-justify mt-1.5 leading-relaxed text-soft text-pretty">${lesson.text}</p>
           </div>
         `).join('')}
       </div>
@@ -565,7 +578,7 @@ function renderCaseStudyPage() {
       ${screenSets.map((set) => `
         ${set.title ? `
           <h3 class="mt-12 text-xl font-semibold tracking-tight">${set.title}</h3>
-          ${set.intro ? `<p class="mt-1.5 text-soft">${set.intro}</p>` : ''}
+          ${set.intro ? `<p class="mobile-justify mt-1.5 text-soft">${set.intro}</p>` : ''}
         ` : ''}
         <div class="screen-fan screen-fan--${set.frame || 'phone'} mt-6" data-initial="${set.initialScreen || 0}"${set.screenRatio ? ` style="--screen-ratio: ${set.screenRatio}"` : ''}>
           <div class="screen-fan-stage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="${[project.title, set.title, 'screens'].filter(Boolean).join(' ')}">
@@ -605,8 +618,8 @@ function renderCaseStudyPage() {
     <p class="font-mono text-xs text-muted">
       Case study <span aria-hidden="true">&bull;</span> ${project.period || getProjectLabel(project)} <span aria-hidden="true">&bull;</span> <span data-read-time></span>
     </p>
-    <h1 class="mt-4 max-w-[20ch] text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-balance">${study.headline}</h1>
-    <p class="mt-5 max-w-[65ch] text-base sm:text-lg leading-relaxed text-soft text-pretty">${study.intro}</p>
+    <h1 class="mt-4 text-4xl sm:text-5xl font-bold tracking-[-0.03em] leading-[1.05] text-pretty">${study.headline}</h1>
+    <p class="mobile-justify mt-5 text-base sm:text-lg leading-relaxed text-soft text-pretty">${study.intro}</p>
 
     <a href="${projectUrl}" class="card mt-8 flex-row items-center gap-4 p-3">
       <span class="block aspect-video w-24 shrink-0 overflow-hidden rounded-md border border-line bg-surface sm:w-32">

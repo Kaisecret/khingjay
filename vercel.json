@@ -10,7 +10,17 @@
       "has": [{ "type": "host", "value": "khingjay.vercel.app" }],
       "destination": "https://www.khingjay.tech/$1",
       "permanent": true
-    }
+    },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/htmlfiles/index.html", "destination": "/", "permanent": true },
+    { "source": "/experience.html", "destination": "/experience", "permanent": true },
+    { "source": "/htmlfiles/experience.html", "destination": "/experience", "permanent": true },
+    { "source": "/tech-stack.html", "destination": "/tech-stack", "permanent": true },
+    { "source": "/htmlfiles/tech-stack.html", "destination": "/tech-stack", "permanent": true },
+    { "source": "/project.html", "destination": "/project", "permanent": true },
+    { "source": "/htmlfiles/project.html", "destination": "/project", "permanent": true },
+    { "source": "/case-study.html", "destination": "/case-study", "permanent": true },
+    { "source": "/htmlfiles/case-study.html", "destination": "/case-study", "permanent": true }
   ],
   "headers": [
     {
@@ -29,11 +39,9 @@
   "rewrites": [
     { "source": "/", "destination": "/htmlfiles/index.html" },
     { "source": "/experience", "destination": "/htmlfiles/experience.html" },
-    { "source": "/experience.html", "destination": "/htmlfiles/experience.html" },
-    { "source": "/project.html", "destination": "/htmlfiles/project.html" },
-    { "source": "/case-study.html", "destination": "/htmlfiles/case-study.html" },
     { "source": "/tech-stack", "destination": "/htmlfiles/tech-stack.html" },
-    { "source": "/tech-stack.html", "destination": "/htmlfiles/tech-stack.html" },
+    { "source": "/project", "destination": "/htmlfiles/project.html" },
+    { "source": "/case-study", "destination": "/htmlfiles/case-study.html" },
     { "source": "/api/send-email", "destination": "/api/send-email.php" },
     { "source": "/api/chatbot", "destination": "/api/chatbot.php" }
   ]
