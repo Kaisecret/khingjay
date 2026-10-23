@@ -1,0 +1,721 @@
+/* Halloween theme (Oct 29 – Nov 2, Philippine time). Loaded by js/logic/halloweenSeason.mjs only while it is on. */
+
+.halloween #home {
+    position: relative;
+    isolation: isolate;
+}
+
+/* Shared palette for the hero scene and the page-wide backdrop */
+.hw-scene,
+.hw-ambient {
+    --hw-ink: 14 8 6;
+    --hw-ink-alpha: 1;
+    --hw-hill: 38 15 8;
+    --hw-web: 255 140 50;
+    --hw-web-alpha: 0.5;
+    --hw-mist: 255 150 90;
+    --hw-ghost: 238 236 248;
+    --hw-ghost-alpha: 0.85;
+    --hw-spider: #ff7a1a;
+    --hw-moon-x: 80%;
+    --hw-moon-y: 27%;
+    --hw-moon-size: clamp(9rem, 21vw, 19rem);
+}
+
+/* Page-wide backdrop: fixed behind every section; decorations keep to the screen edges */
+.hw-ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    animation: hw-scene-in 1.4s var(--ease-out) both;
+}
+
+.hw-ambient-sky {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 100% 14%, rgb(255 122 26 / 0.2), transparent 28rem),
+        radial-gradient(ellipse 38% 45% at 0% 100%, rgb(255 96 18 / 0.26), transparent 72%),
+        radial-gradient(ellipse 38% 45% at 100% 100%, rgb(255 96 18 / 0.22), transparent 72%),
+        linear-gradient(180deg, #07040a 0%, #0d0608 55%, #170805 100%);
+}
+
+.hw-ambient-moon {
+    position: absolute;
+    right: -3.5rem;
+    top: 16vh;
+    width: clamp(7rem, 11vw, 11rem);
+    opacity: 0.85;
+}
+
+.hw-ambient .hw-fog {
+    height: 38%;
+}
+
+.hw-ambient .hw-fog--front {
+    height: 24%;
+}
+
+.hw-ambient-web {
+    width: clamp(6rem, 11vw, 10rem);
+}
+
+.hw-ambient-lantern {
+    bottom: 0.75rem;
+    --w: clamp(4rem, 5.5vw, 5.75rem);
+}
+
+.hw-ambient-lantern--left { left: -0.75rem; }
+.hw-ambient-lantern--right { right: -0.75rem; }
+
+.hw-ambient .hw-ambient-ghost {
+    left: 2.5vw;
+    right: auto;
+    top: 56vh;
+    width: 3.5rem;
+    opacity: 0.75;
+}
+
+.hw-ambient-moon,
+.hw-ambient-ghost,
+.hw-ambient-lantern {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .hw-ambient-moon { display: block; }
+}
+
+@media (min-width: 1200px) {
+    .hw-ambient-lantern { display: block; }
+}
+
+@media (min-width: 1280px) {
+    .hw-ambient .hw-ambient-ghost { display: block; }
+}
+
+/* Hero scene: full-width night behind the hero, from the top of the page down to the divider */
+.hw-scene {
+    position: absolute;
+    z-index: -1;
+    top: -4rem;
+    bottom: -2rem;
+    left: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    overflow: hidden;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 90%, transparent);
+    mask-image: linear-gradient(to bottom, #000 90%, transparent);
+    animation: hw-scene-in 1.4s var(--ease-out) both;
+}
+
+.hw-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.hw-sky,
+.hw-scrim {
+    position: absolute;
+    inset: 0;
+}
+
+.hw-sky {
+    background:
+        radial-gradient(circle at var(--hw-moon-x) var(--hw-moon-y), rgb(255 122 26 / 0.42), transparent calc(var(--hw-moon-size) * 1.5)),
+        radial-gradient(ellipse 30% 45% at 8% 78%, rgb(255 104 20 / 0.32), transparent 75%),
+        radial-gradient(ellipse 30% 40% at 92% 82%, rgb(255 104 20 / 0.28), transparent 75%),
+        radial-gradient(ellipse 90% 55% at 50% 104%, rgb(255 96 18 / 0.4), transparent 72%),
+        linear-gradient(180deg, #06030a 0%, #110609 50%, #220b05 100%);
+}
+
+.hw-scrim {
+    background: radial-gradient(ellipse 34rem 60% at 50% 55%, rgb(var(--background) / 0.82), rgb(var(--background) / 0.5) 55%, transparent 100%);
+}
+
+.hw-ink {
+    fill: rgb(var(--hw-ink) / var(--hw-ink-alpha));
+}
+
+/* Moon and castle */
+.hw-moon {
+    position: absolute;
+    left: var(--hw-moon-x);
+    top: var(--hw-moon-y);
+    width: var(--hw-moon-size);
+    translate: -50% -50%;
+    animation: hw-moon-rise 2.2s var(--ease-out) both;
+}
+
+.hw-moon,
+.hw-ambient-moon {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 33% 40%, rgb(190 70 10 / 0.28) 0 7%, transparent 8%),
+        radial-gradient(circle at 63% 28%, rgb(190 70 10 / 0.22) 0 5%, transparent 6%),
+        radial-gradient(circle at 57% 64%, rgb(190 70 10 / 0.24) 0 9%, transparent 10%),
+        radial-gradient(circle at 27% 69%, rgb(190 70 10 / 0.18) 0 4%, transparent 5%),
+        radial-gradient(circle at 38% 34%, #ffd9a0, #ff9c3a 48%, #e85d10 78%, #b23d08);
+    box-shadow: 0 0 60px 10px rgb(255 120 30 / 0.45), 0 0 160px 40px rgb(255 100 20 / 0.2);
+}
+
+.hw-castle {
+    position: absolute;
+    left: calc(var(--hw-moon-x) - var(--hw-moon-size) * 0.56);
+    top: calc(var(--hw-moon-y) - var(--hw-moon-size) * 0.14);
+    width: calc(var(--hw-moon-size) * 1.15);
+    -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 92%);
+    mask-image: linear-gradient(to bottom, #000 58%, transparent 92%);
+}
+
+.hw-windows rect {
+    fill: #ffa53a;
+    animation: hw-window 5s infinite;
+}
+
+.hw-windows rect:nth-child(2n) { animation-delay: -1.7s; }
+.hw-windows rect:nth-child(3n) { animation-delay: -3.2s; }
+
+/* Trees, graveyard, fog */
+.hw-tree {
+    position: absolute;
+    bottom: 7%;
+    width: clamp(8rem, 17vw, 16rem);
+    aspect-ratio: 2 / 3;
+}
+
+.hw-tree svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.hw-branches {
+    stroke: rgb(var(--hw-ink) / var(--hw-ink-alpha));
+}
+
+.hw-tree--left {
+    left: -3%;
+}
+
+.hw-tree--right {
+    right: 16%;
+    bottom: 9%;
+    width: clamp(6rem, 11vw, 10rem);
+    transform: scaleX(-1);
+}
+
+.hw-graveyard {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: clamp(7rem, 15vw, 12rem);
+}
+
+.hw-hill {
+    fill: rgb(var(--hw-hill));
+}
+
+.hw-fog {
+    position: absolute;
+    left: -20%;
+    bottom: 0;
+    width: 140%;
+    height: 45%;
+    animation: hw-drift 38s ease-in-out infinite alternate;
+}
+
+.hw-fog--back {
+    background:
+        radial-gradient(ellipse 30% 55% at 25% 75%, rgb(255 110 40 / 0.2), transparent 70%),
+        radial-gradient(ellipse 30% 50% at 70% 80%, rgb(255 120 50 / 0.18), transparent 70%);
+}
+
+.hw-fog--front {
+    height: 30%;
+    background:
+        radial-gradient(ellipse 45% 70% at 35% 100%, rgb(var(--hw-mist) / 0.2), transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 100%, rgb(var(--hw-mist) / 0.16), transparent 70%);
+    animation-duration: 27s;
+    animation-direction: alternate-reverse;
+}
+
+/* Ghost and jack-o'-lanterns */
+.hw-ghost {
+    position: absolute;
+    right: 4%;
+    top: 46%;
+    width: clamp(3.5rem, 5.5vw, 5.5rem);
+    overflow: visible;
+    filter: drop-shadow(0 0 18px rgb(255 255 255 / 0.22));
+    animation: hw-float 6s ease-in-out infinite;
+}
+
+.hw-ghost-body {
+    fill: rgb(var(--hw-ghost) / var(--hw-ghost-alpha));
+}
+
+.hw-ghost-face {
+    fill: #1b1020;
+}
+
+.hw-lantern {
+    position: absolute;
+    bottom: 2%;
+    width: var(--w);
+}
+
+.hw-lantern::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(circle, rgb(255 140 30 / 0.5), transparent 62%);
+    animation: hw-glow 2.8s ease-in-out infinite;
+}
+
+.hw-lantern svg {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.hw-lantern--left { left: 1%; --w: clamp(5.5rem, 11vw, 10rem); }
+.hw-lantern--left-small { left: 11%; bottom: 4%; --w: clamp(3rem, 5vw, 4.75rem); }
+.hw-lantern--right { right: 1%; --w: clamp(5rem, 10vw, 9rem); }
+.hw-lantern--right-small { right: 11.5%; bottom: 5%; --w: clamp(2.6rem, 4.25vw, 4rem); }
+.hw-lantern--left-small::before { animation-delay: -1.1s; }
+.hw-lantern--right::before { animation-delay: -0.6s; }
+.hw-lantern--right-small::before { animation-delay: -1.9s; }
+
+/* Corner webs and hanging spiders */
+.hw-web {
+    position: absolute;
+    top: 0;
+    width: clamp(8rem, 19vw, 16rem);
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 0 3px rgb(255 120 30 / 0.5));
+}
+
+.hw-web--left { left: 0; }
+.hw-web--right { right: 0; transform: scaleX(-1); }
+
+.hw-web path {
+    fill: none;
+    stroke: rgb(var(--hw-web) / var(--hw-web-alpha));
+    vector-effect: non-scaling-stroke;
+}
+
+.hw-web-spokes { stroke-width: 1.2; }
+.hw-web-rings { stroke-width: 1; }
+
+.hw-spider {
+    position: absolute;
+    left: var(--x);
+    top: 0;
+    width: var(--size, 1.4rem);
+    height: var(--len);
+    color: var(--hw-spider);
+    animation: hw-dangle 5s ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+.hw-spider::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -3rem;
+    bottom: calc(var(--size, 1.4rem) * 0.77);
+    width: 1px;
+    background: rgb(var(--hw-web) / 0.6);
+}
+
+.hw-spider svg {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    filter: drop-shadow(0 0 6px rgb(255 110 20 / 0.55));
+}
+
+/* Bats */
+.hw-bat {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    color: rgb(var(--hw-ink) / var(--hw-ink-alpha));
+}
+
+.hw-bat svg {
+    display: block;
+    width: 100%;
+    fill: currentColor;
+    overflow: visible;
+    transform-origin: 50% 40%;
+    filter: drop-shadow(0 0 4px rgb(255 120 30 / 0.45));
+    animation: hw-flap 0.42s ease-in-out infinite alternate;
+}
+
+.hw-bat--sky {
+    animation: hw-hover 7s ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+.hw-bat--cross {
+    left: 0;
+    animation: hw-cross var(--duration, 36s) linear var(--delay, 0s) infinite;
+}
+
+.hw-bat--reverse {
+    animation-direction: reverse;
+}
+
+/* Profile photo: witch hat, bats, warm frame */
+.halloween .hw-portrait {
+    border-color: #ff8a2a;
+    box-shadow:
+        0 0 0 1px rgb(255 138 42 / 0.35),
+        0 10px 32px -8px rgb(255 100 20 / 0.6),
+        0 0 44px -6px rgb(255 110 20 / 0.45);
+}
+
+.hw-portrait-decor {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+}
+
+.hw-hat {
+    position: absolute;
+    left: -19%;
+    top: -19%;
+    width: 70%;
+    overflow: visible;
+    transform: rotate(-17deg);
+    filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.45));
+    animation: hw-hat-in 0.9s var(--ease-out) 0.35s both;
+}
+
+.hw-bat--portrait {
+    color: #120a14;
+    animation: hw-hover 6s ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+.hw-bat--portrait svg {
+    animation-duration: 1.3s;
+}
+
+.hw-name-pumpkin {
+    display: inline-block;
+    width: 0.92em;
+    height: 0.77em;
+    margin-left: 0.22em;
+    vertical-align: -0.04em;
+    overflow: visible;
+    filter: drop-shadow(0 0 10px rgb(255 120 20 / 0.55));
+    animation: hw-bob 3.2s ease-in-out infinite;
+}
+
+.halloween #home .tag {
+    border-color: rgb(255 138 42 / 0.75);
+    color: rgb(var(--foreground));
+    box-shadow: 0 0 14px -4px rgb(255 110 20 / 0.7), inset 0 0 8px -4px rgb(255 120 30 / 0.5);
+}
+
+.halloween main hr {
+    border-color: rgb(255 122 26 / 0.3);
+}
+
+/* "Happy Halloween!" greeting: letters drop in, bats scatter, then it fades. No box behind it.
+   Creepster by Sideshow (SIL Open Font License), trimmed to the greeting's letters. */
+@font-face {
+    font-family: 'Creepster';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url('/fonts/creepster-greeting.woff2') format('woff2');
+}
+
+.hw-greeting {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    pointer-events: none;
+    animation: hw-greeting-out 0.8s var(--ease-out) 3.1s forwards;
+}
+
+.hw-greeting-text {
+    margin: 0;
+    font-family: 'Creepster', 'Geist', sans-serif;
+    font-size: clamp(3.25rem, 16vw, 9rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    text-align: center;
+    color: #ff7a1a;
+    text-shadow:
+        0 0 2px #3a1300,
+        0 4px 18px rgb(0 0 0 / 0.85),
+        0 0 46px rgb(0 0 0 / 0.75),
+        0 0 64px rgb(255 110 20 / 0.45);
+}
+
+.hw-greeting-word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.hw-greeting-word > span {
+    display: inline-block;
+    animation: hw-letter-drop 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 45ms) both;
+}
+
+.hw-greeting-bat {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(2rem, 4vw, 3.25rem);
+    margin: -0.75rem 0 0 -1.5rem;
+    color: #1c0f08;
+    opacity: 0;
+    animation: hw-bat-burst 1.8s var(--ease-out) var(--delay) forwards;
+}
+
+.hw-greeting-bat svg {
+    display: block;
+    width: 100%;
+    fill: currentColor;
+    transform-origin: 50% 40%;
+    filter: drop-shadow(0 0 6px rgb(255 120 30 / 0.7));
+    animation: hw-flap 0.2s ease-in-out infinite alternate;
+}
+
+:root:not(.dark) .hw-greeting-text {
+    color: #e8650a;
+    text-shadow:
+        0 0 2px #fff,
+        0 0 16px #fff,
+        0 0 36px rgb(255 255 255 / 0.95),
+        0 0 56px rgb(255 140 40 / 0.4);
+}
+
+.hw-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Light theme: the same scene at dusk, drawn like paper cut-outs */
+:root:not(.dark) :is(.hw-scene, .hw-ambient) {
+    --hw-ink: 64 34 18;
+    --hw-ink-alpha: 0.72;
+    --hw-hill: 246 206 170;
+    --hw-web: 170 80 20;
+    --hw-web-alpha: 0.42;
+    --hw-mist: 255 255 255;
+    --hw-ghost: 255 255 255;
+    --hw-ghost-alpha: 0.96;
+    --hw-spider: #c2410c;
+}
+
+:root:not(.dark) .hw-sky {
+    background:
+        radial-gradient(circle at var(--hw-moon-x) var(--hw-moon-y), rgb(255 150 60 / 0.4), transparent calc(var(--hw-moon-size) * 1.5)),
+        radial-gradient(ellipse 80% 45% at 50% 108%, rgb(255 140 60 / 0.32), transparent 72%),
+        linear-gradient(180deg, #fffaf4 0%, #ffeedd 55%, #ffd9b5 100%);
+}
+
+:root:not(.dark) .hw-ambient-sky {
+    background:
+        radial-gradient(circle at 100% 14%, rgb(255 150 60 / 0.22), transparent 28rem),
+        radial-gradient(ellipse 38% 45% at 0% 100%, rgb(255 140 60 / 0.24), transparent 72%),
+        radial-gradient(ellipse 38% 45% at 100% 100%, rgb(255 140 60 / 0.2), transparent 72%),
+        linear-gradient(180deg, #fffcf8 0%, #fff6ee 55%, #ffeedf 100%);
+}
+
+:root:not(.dark) .hw-castle {
+    opacity: 0.7;
+}
+
+:root:not(.dark) .hw-ghost {
+    filter: drop-shadow(0 4px 10px rgb(120 60 20 / 0.28));
+}
+
+:root:not(.dark) .hw-web,
+:root:not(.dark) .hw-bat--sky svg,
+:root:not(.dark) .hw-bat--cross svg {
+    filter: none;
+}
+
+:root:not(.dark).halloween #home .tag {
+    border-color: rgb(234 108 20 / 0.7);
+    box-shadow: 0 0 12px -5px rgb(234 108 20 / 0.6);
+}
+
+/* Phones: keep the corners, drop what would sit behind the text */
+@media (max-width: 639px) {
+    .hw-scene {
+        --hw-moon-x: 88%;
+        --hw-moon-y: 4.25rem;
+        --hw-moon-size: 5.5rem;
+    }
+
+    .hw-castle,
+    .hw-tree--right,
+    .hw-ghost,
+    .hw-ambient-spider,
+    .hw-scene .hw-bat--cross,
+    .hw-lantern--right-small,
+    .hw-bat--wide {
+        display: none;
+    }
+
+    .hw-scrim {
+        background: radial-gradient(ellipse 85% 46% at 50% 62%, rgb(var(--background) / 0.8), rgb(var(--background) / 0.5) 60%, transparent 100%);
+    }
+
+    .hw-tree--left {
+        width: 7rem;
+        bottom: 4%;
+        opacity: 0.8;
+    }
+
+    .hw-lantern--left { bottom: 6%; --w: 4.5rem; }
+    .hw-lantern--left-small { left: 20%; bottom: 7%; --w: 2.5rem; }
+    .hw-lantern--right { bottom: 6%; --w: 4rem; }
+    .hw-web { width: 6.5rem; }
+    .hw-spider { --size: 1.1rem; }
+
+    .hw-hat {
+        left: -13%;
+        top: -17%;
+        width: 64%;
+    }
+}
+
+@media (min-width: 768px) {
+    .hw-scene {
+        bottom: -2.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hw-scene,
+    .hw-scene *,
+    .hw-scene *::before,
+    .hw-ambient,
+    .hw-ambient *,
+    .hw-ambient *::before,
+    .hw-portrait-decor *,
+    .hw-name-pumpkin {
+        animation: none !important;
+    }
+
+    .hw-bat--cross,
+    .hw-greeting-bat {
+        display: none;
+    }
+
+    .hw-greeting-word > span {
+        animation: none;
+    }
+
+    .hw-greeting {
+        animation: hw-scene-in 0.6s ease reverse 3.1s forwards;
+    }
+}
+
+@keyframes hw-letter-drop {
+    from { opacity: 0; transform: translateY(-0.6em) rotate(-12deg) scale(0.6); filter: blur(6px); }
+    to { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes hw-greeting-out {
+    to { opacity: 0; transform: translateY(-1.5rem) scale(1.04); filter: blur(8px); }
+}
+
+@keyframes hw-bat-burst {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--tilt)); }
+}
+
+@keyframes hw-scene-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes hw-moon-rise {
+    from { transform: translateY(2.5rem); opacity: 0.5; }
+    to { transform: none; opacity: 1; }
+}
+
+@keyframes hw-hat-in {
+    from { transform: translateY(-1.5rem) rotate(-30deg); opacity: 0; }
+    to { transform: rotate(-17deg); opacity: 1; }
+}
+
+@keyframes hw-window {
+    0%, 100% { opacity: 1; }
+    44% { opacity: 0.85; }
+    48% { opacity: 0.4; }
+    52% { opacity: 0.95; }
+    70% { opacity: 0.7; }
+}
+
+@keyframes hw-glow {
+    0%, 100% { opacity: 0.75; }
+    18% { opacity: 1; }
+    34% { opacity: 0.6; }
+    52% { opacity: 0.95; }
+    76% { opacity: 0.7; }
+}
+
+@keyframes hw-drift {
+    from { transform: translateX(-4%); }
+    to { transform: translateX(4%); }
+}
+
+@keyframes hw-float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-0.9rem) rotate(3deg); }
+}
+
+@keyframes hw-bob {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-0.12em) rotate(4deg); }
+}
+
+@keyframes hw-dangle {
+    from { transform: translateY(-1.25rem); }
+    to { transform: translateY(0.5rem); }
+}
+
+@keyframes hw-flap {
+    from { transform: scaleY(1); }
+    to { transform: scaleY(0.6); }
+}
+
+@keyframes hw-hover {
+    0% { transform: translate(0, 0) rotate(-4deg); }
+    50% { transform: translate(1.2rem, -0.8rem) rotate(3deg); }
+    100% { transform: translate(-0.6rem, 0.5rem) rotate(-2deg); }
+}
+
+@keyframes hw-cross {
+    0% { transform: translate(-10vw, 0); }
+    50% { transform: translate(50vw, 3rem); }
+    100% { transform: translate(110vw, 0); }
+}
