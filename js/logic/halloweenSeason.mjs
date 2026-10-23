@@ -1,7 +1,8 @@
 // Halloween theme: on from 12:00 AM October 29 to 12:00 AM November 3, Philippine time, every year.
 // The scene itself lives in halloweenScene.mjs and css/halloween.css, loaded only while it is on.
 // Previewing: on your own computer (Live Server, localhost) a "Halloween" test button appears;
-// on any host, ?halloween=on or ?halloween=off in the URL forces it. Visitors never see the button.
+// on any host, ?halloween=on or ?halloween=off forces it for this tab's visit, including page navigation.
+// Use ?halloween=auto to return to the schedule. Visitors never see the button.
 
 const MANILA_UTC_OFFSET_MS = 8 * 60 * 60 * 1000; // Philippine time has no daylight saving
 const MAX_TIMER_MS = 2 ** 31 - 1; // setTimeout limit (about 24 days)
@@ -35,13 +36,19 @@ export function getNextSeasonChange(now = new Date()) {
 }
 
 function isLocalPreview() {
-  return ['localhost', '127.0.0.1', '::1', ''].includes(window.location.hostname)
-    || window.location.pathname.includes('/htmlfiles/');
+  return ['localhost', '127.0.0.1', '[::1]', ''].includes(window.location.hostname);
 }
 
 function getPreviewMode(isLocal) {
   const fromUrl = new URLSearchParams(window.location.search).get('halloween');
-  if (PREVIEW_MODES.includes(fromUrl)) return fromUrl;
+  if (PREVIEW_MODES.includes(fromUrl)) {
+    savePreviewMode(fromUrl, isLocal);
+    return fromUrl;
+  }
+  try {
+    const saved = sessionStorage.getItem(PREVIEW_STORAGE_KEY);
+    if (PREVIEW_MODES.includes(saved)) return saved;
+  } catch {}
   if (!isLocal) return 'auto';
   try {
     const saved = localStorage.getItem(PREVIEW_STORAGE_KEY);
@@ -51,7 +58,13 @@ function getPreviewMode(isLocal) {
   }
 }
 
-function savePreviewMode(mode) {
+function savePreviewMode(mode, isLocal) {
+  // URL previews must survive navigation on clean live routes as well as local HTML files.
+  // Remember "auto" too, so it overrides any older preview choice for this visit.
+  try {
+    sessionStorage.setItem(PREVIEW_STORAGE_KEY, mode);
+  } catch {}
+  if (!isLocal) return;
   try {
     if (mode === 'auto') localStorage.removeItem(PREVIEW_STORAGE_KEY);
     else localStorage.setItem(PREVIEW_STORAGE_KEY, mode);
@@ -175,7 +188,7 @@ export function initHalloween() {
     // Turning the theme on with the test button replays the greeting and voice.
     mountPreviewToggle(() => mode, (next) => {
       mode = next;
-      savePreviewMode(next);
+      savePreviewMode(next, isLocal);
       update({ greet: true });
     });
   }
